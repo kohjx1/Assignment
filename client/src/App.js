@@ -1,17 +1,19 @@
 import "./App.css"
 
-import { BrowserRouter as Router, Route, Routes, Link } from "react-router-dom"
+import { BrowserRouter as Router, Route, Routes } from "react-router-dom"
 
 import Login from "./components/login"
 import Signup from "./components/signup"
+import Navbar from "./components/navBar"
+
+// toggle to check ( test only )
+const loggedin = true
 
 function App() {
   return (
     <Router>
-      <nav>
-        <Link to="/">Log In</Link>
-        <Link to="/Signup">Sign up</Link>
-      </nav>
+      {loggedin ? <Navbar /> : ""}
+
       <Routes>
         <Route path="/" element={<Login />} />
         <Route path="/Signup" element={<Signup />} />
