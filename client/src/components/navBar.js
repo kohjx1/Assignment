@@ -14,8 +14,10 @@ import MenuItem from "@mui/material/MenuItem"
 import { CardMedia } from "@mui/material"
 import logo from "./stengineering.png"
 
-const pages = ["Products", "Pricing", "Blog"]
-const settings = ["Profile", "Account", "Dashboard", "Logout"]
+import { Link } from "react-router-dom"
+
+const pages = ["UserManagementGroup", "createUser"]
+const settings = ["Profile", "Dashboard", "Logout"]
 
 const ResponsiveAppBar = () => {
   const [anchorElNav, setAnchorElNav] = React.useState(null)
@@ -68,16 +70,22 @@ const ResponsiveAppBar = () => {
               >
                 {pages.map(page => (
                   <MenuItem key={page} onClick={handleCloseNavMenu}>
-                    <Typography textAlign="center">{page}</Typography>
+                    <Typography textAlign="center">
+                      <Link style={{ textDecoration: "none", color: "inherit" }} to={`/${page}`}>
+                        {page}
+                      </Link>
+                    </Typography>
                   </MenuItem>
                 ))}
               </Menu>
             </Box>
 
-            <Box sx={{ pl: "750px", flexGrow: 1, display: { xs: "none", md: "flex" } }}>
+            <Box sx={{ pl: "650px", flexGrow: 1, display: { xs: "none", md: "flex" } }}>
               {pages.map(page => (
                 <Button key={page} onClick={handleCloseNavMenu} sx={{ my: 2, color: "white", display: "block" }}>
-                  {page}
+                  <Link style={{ textDecoration: "none", color: "white" }} to={`/${page}`}>
+                    {page}
+                  </Link>
                 </Button>
               ))}
             </Box>

@@ -3,8 +3,9 @@ import "./App.css"
 import { BrowserRouter as Router, Route, Routes } from "react-router-dom"
 
 import Login from "./components/login"
-import Signup from "./components/signup"
+import CreateUser from "./components/createUser"
 import Navbar from "./components/navBar"
+import UserManagementGroup from "./components/userManagementGroup"
 
 // toggle to check ( test only )
 const loggedin = true
@@ -16,7 +17,8 @@ function App() {
 
       <Routes>
         <Route path="/" element={<Login />} />
-        <Route path="/Signup" element={<Signup />} />
+        <Route path="/createUser" element={<CreateUser />} />
+        <Route path="/UserManagementGroup" element={<UserManagementGroup />} />
       </Routes>
     </Router>
   )

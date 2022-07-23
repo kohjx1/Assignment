@@ -1,4 +1,5 @@
 const user = require("./app/routes/userRoutes")
+const auth = require("./app/routes/auth")
 
 const express = require("express")
 const app = express()
@@ -8,7 +9,8 @@ app.use(cors())
 
 // to parse requests of content-type - application/json
 app.use(express.json())
-app.use(user)
+app.use("/auth", auth)
+app.use("/", user)
 
 //set port, listen for requests
 const PORT = process.env.PORT || 8080

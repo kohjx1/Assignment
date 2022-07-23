@@ -1,4 +1,4 @@
-import React from "react"
+import React, { useState } from "react"
 import { Grid, Paper, Avatar, TextField, Button } from "@mui/material"
 import KeyIcon from "@mui/icons-material/Key"
 import { Link } from "react-router-dom"
@@ -8,6 +8,9 @@ function login() {
   const paperStyle = { padding: 10, height: "80vh", width: 280, margin: "20px auto" }
   const avatarStyle = { background: "green" }
   const inputStyle = { height: 80 }
+
+  const [username, setUsername] = useState("")
+  const [password, setPassword] = useState("")
 
   return (
     <Grid>

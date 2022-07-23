@@ -1,4 +1,5 @@
 const db = require("../models/dbcon")
+const { validationResult } = require("express-validator")
 
 // Create new account
 exports.signup = (req, res) => {
@@ -7,11 +8,16 @@ exports.signup = (req, res) => {
       message: "Content can not be empty!"
     })
   }
-  const user = req.body.username
-  const email = req.body.email
-  const pass = req.body.password
+
+  const { username, email, password } = req.body
+
+  const errors = validationResult(req)
+
+  if (!errors.isEmpty()) {
+    return res.send(errors)
+  }
   let sql = "INSERT INTO accounts SET username = ?, email = ?, password = ? "
-  db.query(sql, [user, email, pass], (err, result) => {
+  db.query(sql, [username, email, password], (err, result) => {
     if (err) throw err
     console.log("User Data Created Successfully")
     res.send(result)
