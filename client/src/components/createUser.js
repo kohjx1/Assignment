@@ -57,7 +57,7 @@ function Register() {
           onChange={e => {
             setEmail(e.target.value)
           }}
-          error={error ? true : false}
+          error={getError(error, "email") ? true : false}
           helperText={getError(error, "email")}
         />
         <></>
@@ -70,7 +70,7 @@ function Register() {
           onChange={e => {
             setUsername(e.target.value)
           }}
-          error={error ? true : false}
+          error={getError(error, "email") ? true : false}
           helperText={getError(error, "username")}
         />
         <></>
@@ -84,7 +84,7 @@ function Register() {
           onChange={e => {
             setPassword(e.target.value)
           }}
-          error={error ? true : false}
+          error={getError(error, "email") ? true : false}
           helperText={getError(error, "password")}
         />
         <></>
