@@ -15,14 +15,25 @@ function Register() {
   const [password, setPassword] = useState("")
   const [error, setErrors] = useState("")
 
+  const handleClickSuccess = () => {
+    setEmail("")
+    setUsername("")
+    setPassword("")
+    setErrors("")
+  }
+
   async function addUser(e) {
     e.preventDefault()
     try {
       const response = await Axios.post("http://localhost:8080/createUser", { username: username, email: email, password: password })
 
       const err = response.data.errors
-      // console.log(err.filter(e => e.param === "email")[0].msg)
-      setErrors(err)
+      if (err) {
+        setErrors(err)
+      } else {
+        handleClickSuccess()
+      }
+
       return
     } catch (e) {
       console.log("There was a problem")
@@ -49,6 +60,7 @@ function Register() {
           <h2>Create New User</h2>
         </Grid>
         <TextField
+          value={email}
           label="Email"
           placeholder="Enter Email"
           style={inputStyle}
@@ -60,8 +72,9 @@ function Register() {
           error={getError(error, "email") ? true : false}
           helperText={getError(error, "email")}
         />
-        <></>
+        <h3></h3>
         <TextField
+          value={username}
           label="Username"
           placeholder="Enter Username"
           style={inputStyle}
@@ -70,11 +83,12 @@ function Register() {
           onChange={e => {
             setUsername(e.target.value)
           }}
-          error={getError(error, "email") ? true : false}
+          error={getError(error, "username") ? true : false}
           helperText={getError(error, "username")}
         />
-        <></>
+        <h3></h3>
         <TextField
+          value={password}
           label="Password"
           placeholder="Enter Password"
           style={inputStyle}
@@ -84,10 +98,10 @@ function Register() {
           onChange={e => {
             setPassword(e.target.value)
           }}
-          error={getError(error, "email") ? true : false}
+          error={getError(error, "password") ? true : false}
           helperText={getError(error, "password")}
         />
-        <></>
+        <h3></h3>
         <Button type="submit" color="primary" variant="contained" fullWidth onClick={addUser}>
           Create
         </Button>
