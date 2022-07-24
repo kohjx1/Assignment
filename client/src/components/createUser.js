@@ -1,6 +1,6 @@
-import React, { useState } from "react"
+import React, { useState, useEffect } from "react"
 import { useNavigate } from "react-router-dom"
-import { Grid, Paper, Avatar, TextField, Button } from "@mui/material"
+import { Grid, Paper, Avatar, TextField, Button, Alert, Collapse } from "@mui/material"
 import KeyIcon from "@mui/icons-material/Key"
 import Axios from "axios"
 
@@ -14,6 +14,15 @@ function Register() {
   const [username, setUsername] = useState("")
   const [password, setPassword] = useState("")
   const [error, setErrors] = useState("")
+  const [success, setSuccess] = useState(false)
+
+  useEffect(() => {
+    const timeout = setTimeout(() => {
+      setSuccess(false)
+    }, 2000)
+
+    return () => clearTimeout(timeout)
+  }, [success])
 
   const handleClickSuccess = () => {
     setEmail("")
@@ -31,6 +40,7 @@ function Register() {
       if (err) {
         setErrors(err)
       } else {
+        setSuccess(true)
         handleClickSuccess()
       }
 
@@ -52,6 +62,9 @@ function Register() {
 
   return (
     <Grid>
+      <Collapse in={success}>
+        <Alert severity="success">Created New User Successfully</Alert>
+      </Collapse>
       <Paper elevation={10} style={paperStyle}>
         <Grid align="center">
           <Avatar style={avatarStyle}>
