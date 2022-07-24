@@ -2,27 +2,80 @@ const db = require("../models/dbcon")
 const { validationResult } = require("express-validator")
 
 // Create new account
-exports.signup = (req, res) => {
-  if (!req.body) {
-    res.status(400).send({
-      message: "Content can not be empty!"
-    })
-  }
+exports.create = (req, res) => {
+  // if (!req.body) {
+  //   res.status(400).send({
+  //     message: "Content can not be empty!"
+  //   })
+  // }
 
   const { username, email, password } = req.body
 
   const errors = validationResult(req)
 
+  // validation errors will automatically respond on frontend form
   if (!errors.isEmpty()) {
     return res.send(errors)
+  } else {
+    // Create new data in database
+    let sql2 = "INSERT INTO accounts SET username = ?, email = ?, password = ? "
+    db.query(sql2, [username, email, password], (err2, result2) => {
+      if (err2) throw err2
+      console.log("User Data Created Successfully")
+      res.send(result2)
+      return
+    })
   }
-  let sql = "INSERT INTO accounts SET username = ?, email = ?, password = ? "
-  db.query(sql, [username, email, password], (err, result) => {
-    if (err) throw err
-    console.log("User Data Created Successfully")
-    res.send(result)
-    return
-  })
+}
+
+exports.auth = (req, res) => {
+  const { username, password } = req.body
+
+  const errors = validationResult(req)
+  console.log(errors)
+  // validation errors will automatically respond on frontend form
+  if (!errors.isEmpty()) {
+    return res.send(errors)
+  } else {
+    // check database
+    let sql = `SELECT * FROM accounts WHERE username = ?`
+    db.query(sql, [username], (err, result) => {
+      const dbpassword = result[0].password
+      const dbusername = result[0].username
+      // if username and password are the same
+      if (dbpassword === password && dbusername === username) {
+        res.send("User Authenticated")
+      } else {
+        // if not same send error message
+        res.status(400).send({
+          errors: [{ param: "auth", msg: "Username or Password is Incorrect" }]
+        })
+      }
+    })
+  }
+  // validate if user doesn't already exist in database
+  // let sql = `SELECT * FROM accounts WHERE username = ?`
+  // db.query(sql, [username], (err, result) => {
+  //   // no username of this kind exists
+  //   if (result.length === 0) {
+  //     res.status(400).send({
+  //       param: "auth",
+  //       msg: "Username or Password is Incorrect"
+  //     })
+  //   }
+  //   const dbpassword = result[0].password
+  //   const dbusername = result[0].username
+  //   // if username and password are the same
+  //   if (dbpassword === password && dbusername === username) {
+  //     res.send("User Authenticated")
+  //   } else {
+  //     // if not same send error message
+  //     res.status(400).send({
+  //       param: "auth",
+  //       msg: "Username or Password is Incorrect"
+  //     })
+  //   }
+  // })
 }
 
 // Looking up all users

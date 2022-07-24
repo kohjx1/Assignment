@@ -1,8 +1,32 @@
 const { check } = require("express-validator")
+const db = require("../models/dbcon")
+
+function isUsernameInUse(username) {
+  return new Promise((resolve, reject) => {
+    let sql = `SELECT COUNT(*) AS total FROM accounts WHERE username = ?`
+    db.query(sql, [username], (err, result) => {
+      if (!err) {
+        return resolve(result[0].total > 0)
+      } else {
+        return reject(new Error("Database Error"))
+      }
+    })
+  })
+}
 
 module.exports = {
   validateEmail: check("email").trim().notEmpty().withMessage("You have to enter an Email Address").isEmail().withMessage("Invalid Email Address"),
-  validateUsername: check("username").trim().notEmpty().withMessage("You have to enter an username"),
+  validateUsername: check("username")
+    .trim()
+    .notEmpty()
+    .withMessage("You have to enter an username")
+    .custom(async user => {
+      const value = await isUsernameInUse(user)
+      if (value) {
+        throw new Error("Username is already in use")
+      }
+    })
+    .withMessage("Username already in use"),
   validatePassword: check("password")
     .trim()
     .notEmpty()

@@ -1,6 +1,4 @@
 const user = require("./app/routes/userRoutes")
-const auth = require("./app/routes/auth")
-
 const express = require("express")
 const app = express()
 const cors = require("cors")
@@ -9,7 +7,7 @@ app.use(cors())
 
 // to parse requests of content-type - application/json
 app.use(express.json())
-app.use("/auth", auth)
+
 app.use("/", user)
 
 //set port, listen for requests
