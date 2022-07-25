@@ -7,7 +7,7 @@ const express = require("express")
 const router = express.Router()
 
 router.route("/createUser").post([validateEmail, validatePassword, validateUsername], create)
-router.route("/login").get([validateUsername, validatePassword], auth)
+router.route("/login").post(auth)
 router.route("/users").get(findAll)
 router.route("/:username").get(findOne)
 router.route("/update/:username").put(update)

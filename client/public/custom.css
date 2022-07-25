@@ -1,0 +1,9 @@
+.navbar .navbar-brand {
+  color: #94128a;
+  font-size: 24px;
+}
+
+html {
+  font-size: 20px;
+  -webkit-tap-highlight-color: rgba(0, 0, 0, 0);
+}

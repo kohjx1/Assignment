@@ -1,6 +1,7 @@
 const { check } = require("express-validator")
 const db = require("../models/dbcon")
 
+// function used to validate if username exists in database
 function isUsernameInUse(username) {
   return new Promise((resolve, reject) => {
     let sql = `SELECT COUNT(*) AS total FROM accounts WHERE username = ?`

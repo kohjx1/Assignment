@@ -1,5 +1,4 @@
 import React, { useState, useEffect } from "react"
-import { useNavigate } from "react-router-dom"
 import { Grid, Paper, Avatar, TextField, Button, Alert, Collapse } from "@mui/material"
 import KeyIcon from "@mui/icons-material/Key"
 import Axios from "axios"
@@ -8,7 +7,6 @@ function Register() {
   const paperStyle = { padding: 20, height: "80vh", width: 280, margin: "20px auto" }
   const avatarStyle = { background: "green" }
   const inputStyle = { height: 80 }
-  let navi = useNavigate
 
   const [email, setEmail] = useState("")
   const [username, setUsername] = useState("")
