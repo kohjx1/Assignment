@@ -33,8 +33,8 @@ const Navbar = () => {
               </a>
             </li>
             <li>
-              <a href="#">
-                <span className="glyphicon glyphicon-log-in"></span> Login
+              <a href="#" onClick={appDispatch({ type: "login", data: response.data })}>
+                <span className="glyphicon glyphicon-log-in"></span> Logout
               </a>
             </li>
           </ul>

@@ -19,7 +19,8 @@ function App() {
     loggedIn: Boolean(sessionStorage.getItem("token")),
     flashMessages: [],
     user: {
-      token: sessionStorage.getItem("token")
+      token: sessionStorage.getItem("token"),
+      username: sessionStorage.getItem("username")
     }
   }
 
@@ -28,6 +29,7 @@ function App() {
       case "login":
         draft.loggedIn = true
         draft.user = action.data
+        console.log(draft.user)
         return
 
       case "logout":
@@ -54,7 +56,7 @@ function App() {
     <StateContext.Provider value={state}>
       <DispatchContext.Provider value={dispatch}>
         <Router>
-          <Navbar />
+          {state.loggedIn ? <Navbar /> : ""}
           <FlashMessages messages={state.flashMessages} />
           <Routes>
             <Route path="/" element={<Login />} />

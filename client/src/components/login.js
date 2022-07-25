@@ -49,7 +49,8 @@ function login() {
         setFail(true)
       } else {
         // appDispatch({ type: "flashMessage", value: "Successfully Logged In" })
-        appDispatch({ type: "login" })
+
+        appDispatch({ type: "login", data: response.data })
         sessionStorage.setItem("user", data.username)
         sessionStorage.setItem("token", data.token)
         setSuccess(true)

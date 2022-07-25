@@ -62,7 +62,7 @@ exports.auth = (req, res) => {
         return res.json({ errors: [{ msg: "Username or Password is Incorrect" }] })
       }
       // if passwords match, authenticate
-      let token = await JWT.sign(
+      let token = JWT.sign(
         {
           username
         },
