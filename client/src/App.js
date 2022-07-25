@@ -1,6 +1,6 @@
 import "./App.css"
 
-import React, { useState, useReducer, useEffect, Suspense } from "react"
+import React, { useEffect } from "react"
 import StateContext from "./StateContext"
 import DispatchContext from "./DispatchContext"
 import { useImmerReducer } from "use-immer"
@@ -29,7 +29,7 @@ function App() {
       case "login":
         draft.loggedIn = true
         draft.user = action.data
-        console.log(draft.user)
+
         return
 
       case "logout":
@@ -47,8 +47,10 @@ function App() {
   useEffect(() => {
     if (state.loggedIn) {
       sessionStorage.setItem("token", state.user.token)
+      sessionStorage.setItem("username", state.user.username)
     } else {
       sessionStorage.removeItem("token")
+      sessionStorage.removeItem("username")
     }
   }, [state.loggedIn])
 
@@ -59,7 +61,7 @@ function App() {
           {state.loggedIn ? <Navbar /> : ""}
           <FlashMessages messages={state.flashMessages} />
           <Routes>
-            <Route path="/" element={<Login />} />
+            <Route path="/login" element={<Login />} />
             <Route path="/dashboard" element={<Dashboard />} />
             <Route path="/createUser" element={<CreateUser />} />
             <Route path="/userManagement" element={<UserManagement />} />

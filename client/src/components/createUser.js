@@ -4,7 +4,7 @@ import KeyIcon from "@mui/icons-material/Key"
 import Axios from "axios"
 
 function Register() {
-  const paperStyle = { padding: 20, height: "80vh", width: 280, margin: "20px auto" }
+  const paperStyle = { padding: 20, height: "80vh", width: 400, margin: "20px" }
   const avatarStyle = { background: "green" }
   const inputStyle = { height: 80 }
 

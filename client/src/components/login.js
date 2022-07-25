@@ -5,7 +5,6 @@ import KeyIcon from "@mui/icons-material/Key"
 import { Link } from "react-router-dom"
 import Axios from "axios"
 import DispatchContext from "../DispatchContext"
-import StateContext from "../StateContext"
 
 function login() {
   const paperStyle = { padding: 10, height: "65vh", width: 400, margin: "20px auto" }
@@ -51,8 +50,6 @@ function login() {
         // appDispatch({ type: "flashMessage", value: "Successfully Logged In" })
 
         appDispatch({ type: "login", data: response.data })
-        sessionStorage.setItem("user", data.username)
-        sessionStorage.setItem("token", data.token)
         setSuccess(true)
         navigate("/createUser")
       }

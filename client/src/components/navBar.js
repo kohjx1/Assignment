@@ -1,4 +1,23 @@
+import React, { useState, useEffect, useContext } from "react"
+import DispatchContext from "../DispatchContext"
+import StateContext from "../StateContext"
+
+import { Link } from "react-router-dom"
+
 const Navbar = () => {
+  const appDispatch = useContext(DispatchContext)
+  const appState = useContext(StateContext)
+
+  // get current logged in user
+  const currentUser = appState.user.username
+  console.log(currentUser)
+
+  const logout = function () {
+    appDispatch({ type: "logout" })
+    // sessionStorage.removeItem("token")
+    // sessionStorage.removeItem("username")
+  }
+
   return (
     <>
       <nav className="navbar navbar-inverse">
@@ -9,9 +28,6 @@ const Navbar = () => {
             </a>
           </div>
           <ul className="nav navbar-nav">
-            <li className="active">
-              <a href="#">Group Management</a>
-            </li>
             <li className="dropdown">
               <a className="dropdown-toggle" data-toggle="dropdown" href="#">
                 User Management<span className="caret"></span>
@@ -25,6 +41,9 @@ const Navbar = () => {
                 </li>
               </ul>
             </li>
+            <li className="active">
+              <a href="#">Group Management</a>
+            </li>
           </ul>
           <ul className="nav navbar-nav navbar-right">
             <li>
@@ -33,9 +52,9 @@ const Navbar = () => {
               </a>
             </li>
             <li>
-              <a href="#" onClick={appDispatch({ type: "login", data: response.data })}>
+              <Link to="/login" onClick={logout}>
                 <span className="glyphicon glyphicon-log-in"></span> Logout
-              </a>
+              </Link>
             </li>
           </ul>
         </div>
