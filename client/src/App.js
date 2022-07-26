@@ -7,12 +7,23 @@ import { useImmerReducer } from "use-immer"
 
 import { BrowserRouter as Router, Route, Routes } from "react-router-dom"
 
-import Login from "./components/login"
-import CreateUser from "./components/createUser"
-import Navbar from "./components/navBar"
-import UserManagement from "./components/userManagement"
+import Login from "./components/Login"
+import Navbar from "./components/NavBar"
+import UserManagement from "./components/UserManagement"
 import Dashboard from "./components/Dashboard"
-import FlashMessages from "./components/flashMessages"
+import CreateUser from "./components/CreateUser"
+import EditUser from "./components/EditUser"
+import DisableUser from "./components/DisableUser"
+
+import GroupManagement from "./components/GroupManagement"
+import ViewGroupManagement from "./components/ViewGroupManagement"
+import AssignGroupManagement from "./components/AssignGroupManagement"
+
+import Profile from "./components/Profile"
+
+import FlashMessages from "./components/FlashMessages"
+
+import AdminRoutes from "./components/authRoutes/AdminRoutes"
 
 function App() {
   const initialState = {
@@ -34,6 +45,11 @@ function App() {
 
       case "logout":
         draft.loggedIn = false
+        return
+
+      // to assign new token after credential change
+      case "newToken":
+        draft.user.token = action.value
         return
 
       case "flashMessage":
@@ -62,9 +78,21 @@ function App() {
           <FlashMessages messages={state.flashMessages} />
           <Routes>
             <Route path="/login" element={<Login />} />
-            <Route path="/dashboard" element={<Dashboard />} />
-            <Route path="/createUser" element={<CreateUser />} />
-            <Route path="/userManagement" element={<UserManagement />} />
+
+            <Route element={<AdminRoutes />}>
+              <Route path="/" element={<Dashboard />} />
+
+              <Route path="/UserManagement" element={<UserManagement />} />
+              <Route path="/UserManagement/CreateUser" element={<CreateUser />} />
+              <Route path="/UserManagement/EditUser" element={<EditUser />} />
+              <Route path="/UserManagement/DisableUser" element={<DisableUser />} />
+
+              <Route path="/GroupManagement" element={<GroupManagement />} />
+              <Route path="/GroupManagement/View" element={<ViewGroupManagement />} />
+              <Route path="/GroupManagement/Assign" element={<AssignGroupManagement />} />
+
+              <Route path="/Profile" element={<Profile />} />
+            </Route>
           </Routes>
         </Router>
       </DispatchContext.Provider>

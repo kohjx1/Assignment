@@ -73,6 +73,38 @@ exports.auth = (req, res) => {
   })
 }
 
+exports.userUpdate = async (req, res) => {
+  console.log(req.body)
+  const { user, email, password } = req.body
+
+  const errors = validationResult(req)
+
+  // validation errors will automatically respond on frontend form
+  if (!errors.isEmpty()) {
+    return res.send(errors)
+  } else {
+    // Create new data in database
+    let hashedPassword = await bcrypt.hash(password, salt)
+    let sql = `UPDATE accounts SET email = ?, password = ? WHERE username =?`
+    db.query(sql, [email, hashedPassword, user], (err, result) => {
+      if (err) {
+        throw err
+      } else {
+        const token = JWT.sign(
+          {
+            user
+          },
+          process.env.JWTTOKEN
+        )
+        // send new token, remove old token, set new token as state token
+        res.json({ token })
+
+        console.log("User Data Updated Successfully")
+      }
+    })
+  }
+}
+
 // Looking up all users
 exports.findAll = function (req, res) {
   let sql = "SELECT * FROM accounts"

@@ -14,8 +14,6 @@ const Navbar = () => {
 
   const logout = function () {
     appDispatch({ type: "logout" })
-    // sessionStorage.removeItem("token")
-    // sessionStorage.removeItem("username")
   }
 
   return (
@@ -23,33 +21,46 @@ const Navbar = () => {
       <nav className="navbar navbar-inverse">
         <div className="container-fluid">
           <div className="navbar-header">
-            <a className="navbar-brand" href="#">
-              Kanban
-            </a>
+            <Link to="/" className="navbar-brand">
+              <span></span> Kanban
+            </Link>
           </div>
           <ul className="nav navbar-nav">
             <li className="dropdown">
-              <a className="dropdown-toggle" data-toggle="dropdown" href="#">
+              <a className="dropdown-toggle pointer " data-toggle="dropdown">
                 User Management<span className="caret"></span>
               </a>
               <ul className="dropdown-menu">
                 <li>
-                  <a href="#">Create User</a>
+                  <Link to="/UserManagement/createUser">Create User</Link>
                 </li>
                 <li>
-                  <a href="#">Edit User</a>
+                  <Link to="/UserManagement/EditUser">Edit User</Link>
+                </li>
+                <li>
+                  <Link to="/UserManagement/DisableUser">Disable User</Link>
                 </li>
               </ul>
             </li>
-            <li className="active">
-              <a href="#">Group Management</a>
+            <li className="dropdown">
+              <a className="dropdown-toggle pointer" data-toggle="dropdown">
+                Group Management<span className="caret"></span>
+              </a>
+              <ul className="dropdown-menu">
+                <li>
+                  <Link to="/GroupManagement/View">View Group</Link>
+                </li>
+                <li>
+                  <Link to="/GroupManagement/Assign">Assign Group</Link>
+                </li>
+              </ul>
             </li>
           </ul>
           <ul className="nav navbar-nav navbar-right">
             <li>
-              <a href="#">
+              <Link to="/Profile">
                 <span className="glyphicon glyphicon-user"></span> Profile
-              </a>
+              </Link>
             </li>
             <li>
               <Link to="/login" onClick={logout}>
