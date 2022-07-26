@@ -46,6 +46,7 @@ function Profile() {
       } else {
         setSuccess(true)
         handleClickSuccess()
+        // set new token based on new password auth
         appDispatch({ type: "newToken", data: response.token })
       }
       return

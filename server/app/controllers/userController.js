@@ -73,6 +73,7 @@ exports.auth = (req, res) => {
   })
 }
 
+// Update loggedin user's password and email
 exports.userUpdate = async (req, res) => {
   console.log(req.body)
   const { username, email, password } = req.body

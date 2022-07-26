@@ -60,7 +60,7 @@ function Register() {
 
   return (
     <Grid>
-      <Collapse in={success}>
+      <Collapse in={success} className="parent">
         <Alert severity="success">Created New User Successfully</Alert>
       </Collapse>
       <Paper elevation={10} style={paperStyle}>

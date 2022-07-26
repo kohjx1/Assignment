@@ -29,6 +29,7 @@ function App() {
   const initialState = {
     loggedIn: Boolean(sessionStorage.getItem("token")),
     flashMessages: [],
+    isAdmin: false,
     user: {
       token: sessionStorage.getItem("token"),
       username: sessionStorage.getItem("username")
