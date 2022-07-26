@@ -38,6 +38,8 @@ module.exports = {
     .withMessage("your password should have at least one number")
     .matches(/[!@#$%^&*(),.?":{}|<>]/)
     .withMessage("your password should have at least one sepcial character")
+    .matches(/^[A-Za-z\s]+$/)
+    .withMessage("your password should have at least one alphabet")
   // .matches(/^[A-Za-z0-9 .,'!&]+$/, "g")
   // .withMessage("Password must contain letters, numbers and special characters")
 }

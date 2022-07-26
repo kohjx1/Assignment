@@ -2,7 +2,6 @@ import React, { useState, useEffect, useContext } from "react"
 import { useNavigate } from "react-router-dom"
 import { Grid, Paper, Avatar, TextField, Button, Alert, Collapse } from "@mui/material"
 import KeyIcon from "@mui/icons-material/Key"
-import { Link } from "react-router-dom"
 import Axios from "axios"
 import DispatchContext from "../DispatchContext"
 import StateContext from "../StateContext"
@@ -11,7 +10,7 @@ function Profile() {
   const paperStyle = { padding: 10, height: "65vh", width: 400, margin: "20px auto" }
   const avatarStyle = { background: "#94128a" }
   const inputStyle = { height: 80 }
-  const navigate = useNavigate()
+  // const navigate = useNavigate()
   const appDispatch = useContext(DispatchContext)
   const appState = useContext(StateContext)
 
@@ -19,7 +18,6 @@ function Profile() {
   const currentUser = appState.user.username
   const [email, setEmail] = useState("")
   const [password, setPassword] = useState("")
-
   const [error, setErrors] = useState("")
   const [success, setSuccess] = useState(false)
 
@@ -40,7 +38,7 @@ function Profile() {
   async function updateCredentials(e) {
     e.preventDefault()
     try {
-      const response = await Axios.post("http://localhost:8080/update/:username", { username: currentUser, email: email, password: password })
+      const response = await Axios.post("http://localhost:8080/update", { username: currentUser, email: email, password: password })
 
       const err = response.data.errors
       if (err) {
@@ -49,7 +47,6 @@ function Profile() {
         setSuccess(true)
         handleClickSuccess()
         appDispatch({ type: "newToken", data: response.token })
-        handleClickSuccess
       }
       return
     } catch (e) {
@@ -79,11 +76,13 @@ function Profile() {
           <h2>Update Credentials</h2>
         </Grid>
         <h2></h2>
+
         <TextField
+          value={email}
           label="Email"
           placeholder="Enter New Email"
           style={inputStyle}
-          type="password"
+          // type="password"
           fullWidth
           onChange={e => {
             setEmail(e.target.value)
@@ -91,8 +90,10 @@ function Profile() {
           error={getError(error, "email") ? true : false}
           helperText={getError(error, "email")}
         />
+
         <h2></h2>
         <TextField
+          value={password}
           label="Password"
           placeholder="Enter New Password"
           style={inputStyle}

@@ -51,7 +51,7 @@ function login() {
 
         appDispatch({ type: "login", data: response.data })
         setSuccess(true)
-        navigate("/createUser")
+        navigate("/Dashboard")
       }
       return
     } catch (e) {

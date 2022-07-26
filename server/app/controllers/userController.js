@@ -75,7 +75,7 @@ exports.auth = (req, res) => {
 
 exports.userUpdate = async (req, res) => {
   console.log(req.body)
-  const { user, email, password } = req.body
+  const { username, email, password } = req.body
 
   const errors = validationResult(req)
 
@@ -85,14 +85,14 @@ exports.userUpdate = async (req, res) => {
   } else {
     // Create new data in database
     let hashedPassword = await bcrypt.hash(password, salt)
-    let sql = `UPDATE accounts SET email = ?, password = ? WHERE username =?`
-    db.query(sql, [email, hashedPassword, user], (err, result) => {
+    let sql = `UPDATE accounts SET email = ?, password = ? WHERE username = ?`
+    db.query(sql, [email, hashedPassword, username], (err, result) => {
       if (err) {
         throw err
       } else {
         const token = JWT.sign(
           {
-            user
+            username
           },
           process.env.JWTTOKEN
         )
@@ -103,6 +103,22 @@ exports.userUpdate = async (req, res) => {
       }
     })
   }
+}
+
+exports.checkGroup = (req, res) => {
+  // Init values from the front end
+  const { username, groupname } = req.body
+
+  let sql = `Select * FROM nodelogin.groups Where username = ?`
+  db.query(sql, [username], (err, result) => {
+    if (err) throw err
+
+    if (result[0].groupname === groupname) {
+      return res.json({ inGroup: true })
+    } else {
+      return res.json({ inGroup: false })
+    }
+  })
 }
 
 // Looking up all users
@@ -135,31 +151,31 @@ exports.findOne = function (req, res) {
   }
 }
 
-// Update user details
-exports.update = function (req, res) {
-  if (!req.body) {
-    res.status(400).send({
-      message: "Content cannot be empty"
-    })
-  }
-  const user = req.params.username
-  const email = req.body.email
-  const password = req.body.password
-  let sql = `UPDATE accounts SET email = ?, password = ? WHERE username =?`
-  db.query(sql, [email, password, user], (err, result) => {
-    if (err) {
-      if (err.kind === "not_found") {
-        result.status(404).send({
-          message: `Not found Account with username ${user}.`
-        })
-      } else {
-        result.status(500).send({
-          message: "Error updating Account with username " + user
-        })
-      }
-    } else {
-      console.log("Updated User Details Successfully")
-      res.send(result)
-    }
-  })
-}
+// // Update user details
+// exports.update = function (req, res) {
+//   if (!req.body) {
+//     res.status(400).send({
+//       message: "Content cannot be empty"
+//     })
+//   }
+//   const user = req.params.username
+//   const email = req.body.email
+//   const password = req.body.password
+//   let sql = `UPDATE accounts SET email = ?, password = ? WHERE username =?`
+//   db.query(sql, [email, password, user], (err, result) => {
+//     if (err) {
+//       if (err.kind === "not_found") {
+//         result.status(404).send({
+//           message: `Not found Account with username ${user}.`
+//         })
+//       } else {
+//         result.status(500).send({
+//           message: "Error updating Account with username " + user
+//         })
+//       }
+//     } else {
+//       console.log("Updated User Details Successfully")
+//       res.send(result)
+//     }
+//   })
+// }

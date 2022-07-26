@@ -77,10 +77,10 @@ function App() {
           {state.loggedIn ? <Navbar /> : ""}
           <FlashMessages messages={state.flashMessages} />
           <Routes>
-            <Route path="/login" element={<Login />} />
+            <Route path="/" element={<Login />} />
 
             <Route element={<AdminRoutes />}>
-              <Route path="/" element={<Dashboard />} />
+              <Route path="/Dashboard" element={<Dashboard />} />
 
               <Route path="/UserManagement" element={<UserManagement />} />
               <Route path="/UserManagement/CreateUser" element={<CreateUser />} />

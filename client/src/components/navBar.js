@@ -21,7 +21,7 @@ const Navbar = () => {
       <nav className="navbar navbar-inverse">
         <div className="container-fluid">
           <div className="navbar-header">
-            <Link to="/" className="navbar-brand">
+            <Link to="/Dashboard" className="navbar-brand">
               <span></span> Kanban
             </Link>
           </div>
@@ -63,7 +63,7 @@ const Navbar = () => {
               </Link>
             </li>
             <li>
-              <Link to="/login" onClick={logout}>
+              <Link to="/" onClick={logout}>
                 <span className="glyphicon glyphicon-log-in"></span> Logout
               </Link>
             </li>
