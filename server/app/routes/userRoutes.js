@@ -1,5 +1,5 @@
 // When client sends request, need to determine how server will respond
-const { create, auth, checkGroup, findAll, findOne, userUpdate } = require("../controllers/userController")
+const { create, auth, checkGroup, findAll, findOne, userUpdate, adminUpdateUser } = require("../controllers/userController")
 
 const { validateEmail, validateUsername, validatePassword } = require("../validation/validation")
 
@@ -11,10 +11,11 @@ router.route("/createUser").post([validateEmail, validatePassword, validateUsern
 router.route("/update").post([validateEmail, validatePassword], userUpdate)
 router.route("/login").post(auth)
 router.route("/checkGroup").post(checkGroup)
+router.route("/users").get(findAll)
+router.route("/updateUser").post([validateEmail, validatePassword], adminUpdateUser)
 // Pending
 
 // Incomplete Connection
-router.route("/users").get(findAll)
 router.route("/:username").get(findOne)
 
 // router.route("/update/:username").put(updateall)

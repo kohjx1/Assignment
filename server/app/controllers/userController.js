@@ -106,6 +106,7 @@ exports.userUpdate = async (req, res) => {
   }
 }
 
+// Check if user belongs to particular group
 exports.checkGroup = (req, res) => {
   // Init values from the front end
   const { username, groupname } = req.body
@@ -131,6 +132,32 @@ exports.findAll = function (req, res) {
     res.send(result)
     return
   })
+}
+
+exports.adminUpdateUser = async (req, res) => {
+  console.log(req.body)
+  const { id, password, email, status } = req.body
+
+  const errors = validationResult(req)
+
+  // validation errors will automatically respond on frontend form
+  if (!errors.isEmpty()) {
+    return res.send(errors)
+  } else {
+    // Create new data in database
+    let hashedPassword = await bcrypt.hash(password, salt)
+    let sql = `UPDATE accounts SET email = ?, password = ?, status = ? WHERE id = ?`
+    db.query(sql, [email, hashedPassword, status, id], (err, result) => {
+      if (err) {
+        throw err
+      } else {
+        // send new token, remove old token, set new token as state token
+        res.json({ message: "Updated Successfully" })
+
+        console.log("User Data Updated Successfully")
+      }
+    })
+  }
 }
 
 // Looking up specific user only
