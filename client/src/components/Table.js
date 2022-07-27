@@ -49,10 +49,11 @@ function Table() {
     {
       field: "email",
       headerName: "Email",
-      width: 150
+      width: 150,
+      editable: true
     },
-    { field: "password", headerName: "Password", width: 150 },
-    { field: "status", headerName: "Status", type: "number", width: 150 }
+    { field: "password", headerName: "Password", width: 150, editable: true },
+    { field: "status", headerName: "Status", type: "number", width: 150, editable: true }
   ]
 
   return (
@@ -61,7 +62,20 @@ function Table() {
         Click me
       </button>
       <Box sx={{ height: 400, width: "100%" }}>
-        <DataGrid columns={columns} rows={rows} />
+        <DataGrid
+          initialState={{
+            sorting: { sortModel: [{ field: "id", sort: "desc" }] },
+            columns: {
+              columnVisibilityModel: {
+                id: false
+              }
+            }
+          }}
+          onCellEditCommit={params => console.log(params)}
+          onRowEditCommit={params => console.log(params)}
+          columns={columns}
+          rows={rows}
+        />
       </Box>
     </div>
   )
