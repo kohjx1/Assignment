@@ -1,5 +1,6 @@
 const db = require("../models/dbcon")
 const { validationResult } = require("express-validator")
+const { validEmail } = require("../validation/Regex")
 
 var path = require("path")
 const config = require("dotenv")
@@ -79,7 +80,7 @@ exports.userUpdate = async (req, res) => {
   const { username, email, password } = req.body
 
   const errors = validationResult(req)
-
+  console.log(errors)
   // validation errors will automatically respond on frontend form
   if (!errors.isEmpty()) {
     return res.send(errors)
@@ -138,27 +139,104 @@ exports.adminUpdateUser = async (req, res) => {
   console.log(req.body)
   const { id, password, email, status } = req.body
 
-  const errors = validationResult(req)
+  const isValidEmail = validEmail.test(email)
+  // const isValidPassword = validPassword.test(password)
 
-  // validation errors will automatically respond on frontend form
-  if (!errors.isEmpty()) {
-    return res.send(errors)
+  console.log(email, password)
+  console.log(validEmail.test(email))
+  // console.log(validPassword.test(password))
+
+  // 10 characters request body
+  if (password === "**********") {
+    if (isValidEmail) {
+      let sql = `UPDATE accounts SET email = ?, status = ? WHERE id = ?`
+      db.query(sql, [email, status, id], (err, result) => {
+        if (err) {
+          throw err
+        } else {
+          console.log("Updated Successfully")
+          // this means there is no error and successfully updated
+          res.json({ errors: [] })
+        }
+      })
+      return
+    }
+    const ress = validationResult(req)
+    console.log(ress.errors.filter(e => e.param === "email"))
+    const errors = ress.errors.filter(e => e.param === "email")
+
+    return res.json({ errors: errors })
+    // console.log("Invalid Email Address")
+    // return res.json({ errors: [{ msg: "Invalid Email Address" }] })
   } else {
-    // Create new data in database
-    let hashedPassword = await bcrypt.hash(password, salt)
-    let sql = `UPDATE accounts SET email = ?, password = ?, status = ? WHERE id = ?`
-    db.query(sql, [email, hashedPassword, status, id], (err, result) => {
-      if (err) {
-        throw err
-      } else {
-        // send new token, remove old token, set new token as state token
-        res.json({ message: "Updated Successfully" })
+    const errors = validationResult(req)
+    console.log(errors)
+    // validation errors will automatically respond on frontend form
+    if (!errors.isEmpty()) {
+      console.log(errors)
+      return res.send(errors)
+    } else {
+      // Create new data in database
+      let hashedPassword = await bcrypt.hash(password, salt)
+      let sql = `UPDATE accounts SET email = ?, password = ?, status = ? WHERE id = ?`
+      db.query(sql, [email, hashedPassword, status, id], (err, result) => {
+        if (err) {
+          throw err
+        } else {
+          // send new token, remove old token, set new token as state token
 
-        console.log("User Data Updated Successfully")
-      }
-    })
+          // res.json({ msg: "Updated Successfully" })
+
+          console.log("User Data Updated Successfully")
+          return res.json({ errors: [] })
+        }
+      })
+    }
   }
 }
+
+// else if admin edited pw cell --> oldpw !== password
+
+// const { id, password, email, status, oldpw } = req.body
+// // if password is not changed or touched
+// if (password === oldpw) {
+//   const errors = validationResult(req)
+//   console.log(errors)
+
+//   // check if there are any validationerrors
+//   if (!errors.isEmpty()) {
+//     return res.send(errors)
+//   } else {
+
+//     let sql = `UPDATE accounts SET email = ?, password = ?, status = ? WHERE id = ?`
+//     db.query(sql, [email, hashedPassword, status, id], (err, result) => {
+//       if (err) {
+//         throw err
+//       } else {
+//         // send new token, remove old token, set new token as state token
+//         res.json({ message: "Updated Successfully" })
+
+//         console.log("User Data Updated Successfully")
+//       }
+//     })
+//   }
+// } else {
+//   // if password is changed by admin
+//   // hash the new password and update database
+//   let hashedPassword = await bcrypt.hash(password, salt)
+//   let sql = `UPDATE accounts SET email = ?, password=?, status = ? WHERE id = ?`
+//     db.query(sql, [email, hashedPassword, status, id], (err, result) => {
+//       if (err) {
+//         throw err
+//       } else {
+//         // send new token, remove old token, set new token as state token
+//         res.json({ message: "Updated Successfully" })
+
+//         console.log("User Data Updated Successfully")
+//       }
+//     })
+//   return
+// }
 
 // Looking up specific user only
 exports.findOne = function (req, res) {

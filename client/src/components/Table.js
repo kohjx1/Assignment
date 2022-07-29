@@ -3,18 +3,27 @@ import DispatchContext from "../DispatchContext"
 import StateContext from "../StateContext"
 import Axios from "axios"
 import Box from "@mui/material/Box"
-import { DataGrid, GridApi, useGridApiRef } from "@mui/x-data-grid"
-import { ToggleButton, ToggleButtonGroup } from "@mui/material"
+import { DataGrid } from "@mui/x-data-grid"
+import { Grid, Alert, Collapse, AlertTitle, LinearProgress } from "@mui/material"
 
 function Table() {
   // const appDispatch = useContext(DispatchContext)
   // const appState = useContext(StateContext)
 
   const [data, setData] = useState("")
-  // const [checkbox, setCheckbox] = useState(false)
+  const [error, setErrors] = useState("")
+  const [success, setSuccess] = useState(false)
+  const [fail, setFail] = useState(false)
 
   const rows = data
-  // console.log(rows)
+  console.log(rows)
+
+  var temp = []
+  for (var i = 0; i < rows.length; i++) {
+    // test = temp.push({ ...rows[i], password: "**********" })
+    temp.push({ ...rows[i], password: "**********" })
+  }
+  console.log(temp)
 
   const columns = [
     { field: "id", headerName: "ID", type: "number", width: 90 },
@@ -22,12 +31,28 @@ function Table() {
     {
       field: "email",
       headerName: "Email",
-      width: 150,
+      width: 200,
       editable: true
     },
-    { field: "password", headerName: "Password", width: 700, editable: true },
+    { field: "password", headerName: "Password", type: "string", width: 300, editable: true },
     { field: "status", headerName: "Status", type: "boolean", width: 150, editable: true }
   ]
+
+  useEffect(() => {
+    const timeout = setTimeout(() => {
+      setSuccess(false)
+    }, 1000)
+
+    return () => clearTimeout(timeout)
+  }, [success])
+
+  useEffect(() => {
+    const timeout = setTimeout(() => {
+      setFail(false)
+    }, 500)
+
+    return () => clearTimeout(timeout)
+  }, [fail])
 
   // Function for retrieve all user data from the backend
   async function getData(e) {
@@ -47,77 +72,60 @@ function Table() {
     }
   }
 
-  // const apiRef = useGridApiRef
-  // const onRowEditCommit = (id,event) => {
-  //   let row = apiRef.current.getEditRowsModels();
-  //   handleRowEdit(row);
-  // }
-
-  // const processRowUpdate = newRow => {
-  //   // const updatedRow = { ...newRow, isNew: false }
-  //   // console.log(newRow.id)
-
-  //   // console.log(id)
-  //   // console.log(email)
-  //   // console.log(password)
-  //   // console.log(status)
   async function updateSingleRow(newRow) {
     var updatedRow = { ...newRow, isNew: false }
-    console.log(updatedRow)
-    const { id, username, email, password, status } = updatedRow
-    console.log(updatedRow)
+
+    // console.log(updatedRow)
+    const { id, username, password, email, status } = updatedRow
+    // const oldPassword = oldPw.filter(row => row.id === id)[0].password
+    // console.log(oldPw.filter(row => row.id === id)[0].password)
+
     const response = await Axios.post("http://localhost:8080/updateUser", { id: id, password: password, email: email, status: status })
-    // console.log(response)
-    if (!response) {
-      return "No data exists in database"
-    } else {
+    const err = response.data.errors
+    console.log(err)
+    console.log(err.length)
+    console.log(!err)
+    if (err.length > 0) {
+      // setErrors(getError(err))
+      setErrors(err)
+      setFail(true)
+    } else if (err.length === 0) {
+      setSuccess(true)
       const newRow = { id: id, username: username, email: email, password: password, status: status, isNew: false }
+
       console.log(newRow)
       return newRow
     }
-
-    // return updatedRow
+    return
   }
 
-  // const handleRowEditCommit = React.useCallback(params => {
-  //   const id = params.id
-  //   const password = params.password
-  //   const email = params.email
-  //   const status = params.status
-
-  //   console.log(id)
-  // async function updateSingleRow(e) {
-  //   try {
-  //     const response = await Axios.post("http://localhost:8080/updateUser", { id: id, password: password, email: email, status: status })
-  //     // console.log(response)
-  //     if (!response) {
-  //       return "No data exists in database"
-  //     } else {
-  //       return "Successfully Updated Database"
-  //     }
-  //   } catch (e) {
-  //     console.log("There was an issue with updating particular user data")
-  //   }
-  // }
-  //   updateSingleRow()
-  // }, [])
-
+  console.log(error)
   return (
-    <div>
+    <Grid>
+      <Collapse in={fail}>
+        <Alert severity="warning">
+          <AlertTitle>
+            {(error || []).map((item, i) => (
+              <li>{item.msg}</li>
+            ))}
+          </AlertTitle>
+          {/* some error */}
+        </Alert>
+      </Collapse>
+
+      <Collapse in={success}>
+        <Alert severity="success">Successfully Updated User</Alert>
+      </Collapse>
+
       <div className="flex">
         <button name="button" onClick={getData}>
           Generate
         </button>
-
-        <ToggleButtonGroup>
-          <ToggleButton>Check</ToggleButton>
-        </ToggleButtonGroup>
       </div>
 
       <Box sx={{ height: 400, width: "100%" }}>
         <DataGrid
           density="compact"
-          // checkboxSelection={checkbox}
           initialState={{
             sorting: { sortModel: [{ field: "id", sort: "desc" }] },
             columns: {
@@ -126,18 +134,27 @@ function Table() {
               }
             }
           }}
+          components={{
+            LoadingOverlay: LinearProgress
+          }}
+          // Loading
+          // {...rows}
           editMode="row"
           processRowUpdate={updateSingleRow}
           experimentalFeatures={{ newEditingApi: true }}
-          onProcessRowUpdateError={error => console.log(error)}
-          onRowDoubleClick={params => {
-            console.log(params)
-          }}
+          onProcessRowUpdateError={error => error}
+          // onRowClick={params => {
+          //   console.log("This is email valiation: ", validEmail.test(params.row.email))
+          //   console.log("This is password validation: ", validPassword.test(params.row.password))
+          // }}
+          // onRowDoubleClick={params => {
+          //   console.log(params)
+          // }}
           columns={columns}
-          rows={rows}
+          rows={temp}
         />
       </Box>
-    </div>
+    </Grid>
   )
 }
 
