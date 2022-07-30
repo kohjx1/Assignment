@@ -8,8 +8,6 @@ config.config({ path: path.join(__dirname, "..", "..", "config.env") })
 const bcrypt = require("bcrypt")
 const JWT = require("jsonwebtoken")
 
-//change is made
-
 // bcrypt parameters
 const salt = 10
 
