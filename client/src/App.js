@@ -1,6 +1,6 @@
 import "./App.css"
 
-import React, { useEffect } from "react"
+import React, { useEffect, useState } from "react"
 import StateContext from "./StateContext"
 import DispatchContext from "./DispatchContext"
 import { useImmerReducer } from "use-immer"
@@ -41,7 +41,6 @@ function App() {
       case "login":
         draft.loggedIn = true
         draft.user = action.data
-
         return
 
       case "logout":

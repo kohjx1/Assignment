@@ -11,3 +11,11 @@ html {
 a.pointer {
   cursor: pointer;
 }
+
+.dashboard {
+  display: inline-flex;
+}
+
+.intromsg {
+  padding-left: 300px;
+}

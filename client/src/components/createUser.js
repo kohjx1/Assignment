@@ -1,10 +1,10 @@
-import React, { useState, useEffect } from "react"
+import React, { useState, useEffect, useContext } from "react"
 import { Grid, Paper, Avatar, TextField, Button, Alert, Collapse } from "@mui/material"
 import KeyIcon from "@mui/icons-material/Key"
 import Axios from "axios"
 
 function Register() {
-  const paperStyle = { padding: 20, height: "80vh", width: 400, margin: "20px" }
+  const paperStyle = { padding: 20, height: "75vh", width: 400, margin: "20px" }
   const avatarStyle = { background: "green" }
   const inputStyle = { height: 80 }
 
@@ -30,7 +30,7 @@ function Register() {
   }
 
   async function addUser(e) {
-    e.preventDefault()
+    // e.preventDefault()
     try {
       const response = await Axios.post("http://localhost:8080/createUser", { username: username, email: email, password: password })
 
@@ -68,7 +68,7 @@ function Register() {
           <Avatar style={avatarStyle}>
             <KeyIcon />
           </Avatar>
-          <h2>Create New User</h2>
+          <h2>Add New User</h2>
         </Grid>
         <TextField
           value={email}
