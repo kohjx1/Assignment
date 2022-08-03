@@ -75,7 +75,7 @@ exports.auth = (req, res) => {
 }
 
 // Update loggedin user's password and email
-exports.userUpdate = async (req, res) => {
+exports.emailPassUpdate = async (req, res) => {
   console.log(req.body)
   const { username, email, password } = req.body
 
@@ -107,6 +107,68 @@ exports.userUpdate = async (req, res) => {
   }
 }
 
+exports.updatePassword = async (req, res) => {
+  console.log(req.body)
+  const { username, password } = req.body
+
+  const errors = validationResult(req)
+  console.log(errors)
+  // validation errors will automatically respond on frontend form
+  if (!errors.isEmpty()) {
+    return res.send(errors)
+  } else {
+    // Create new data in database
+    let hashedPassword = await bcrypt.hash(password, salt)
+    let sql = `UPDATE accounts SET password = ? WHERE username = ?`
+    db.query(sql, [hashedPassword, username], (err, result) => {
+      if (err) {
+        throw err
+      } else {
+        const token = JWT.sign(
+          {
+            username
+          },
+          process.env.JWTTOKEN
+        )
+        // send new token, remove old token, set new token as state token
+        res.json({ token })
+
+        console.log("User Data Updated Successfully")
+      }
+    })
+  }
+}
+
+exports.updateEmail = async (req, res) => {
+  console.log(req.body)
+  const { username, email } = req.body
+
+  const errors = validationResult(req)
+  console.log(errors)
+  // validation errors will automatically respond on frontend form
+  if (!errors.isEmpty()) {
+    return res.send(errors)
+  } else {
+    let sql = `UPDATE accounts SET email = ? WHERE username = ?`
+    db.query(sql, [email, username], (err, result) => {
+      if (err) {
+        throw err
+      } else {
+        const token = JWT.sign(
+          {
+            username
+          },
+          process.env.JWTTOKEN
+        )
+        // send new token, remove old token, set new token as state token
+        res.json({ token })
+
+        console.log("User Data Updated Successfully")
+      }
+    })
+  }
+}
+
 // Looking up all users
 exports.findAll = function (req, res) {
   let sql = "SELECT * FROM accounts"
@@ -120,25 +182,39 @@ exports.findAll = function (req, res) {
 
 exports.getUsers = (req, res) => {
   const { selectedMembers } = req.body
-  console.log(selectedMembers)
+  console.log(selectedMembers.length)
 
-  let sql = "SELECT `username` FROM accounts where `username` not in ("
-  for (var i = 0; i < selectedMembers.length; i++) {
-    sql = sql + "?,"
-  }
-  sql = sql.substring(0, sql.length - 1)
-  sql = sql + ")"
-
-  db.query(sql, selectedMembers, (err, result) => {
-    if (err) {
-      throw err
-    } else {
-      console.log(result)
-      console.log("Usernames fetched Successfully")
-      res.send(result)
-      return
+  if (selectedMembers.length === 0) {
+    let sql = "SELECT `username` FROM accounts"
+    db.query(sql, (err, result) => {
+      if (err) {
+        throw err
+      } else {
+        console.log(result)
+        console.log("Usernames fetched Successfully")
+        res.send(result)
+        return
+      }
+    })
+  } else {
+    let sql = "SELECT `username` FROM accounts where `username` not in ("
+    for (var i = 0; i < selectedMembers.length; i++) {
+      sql = sql + "?,"
     }
-  })
+    sql = sql.substring(0, sql.length - 1)
+    sql = sql + ")"
+
+    db.query(sql, selectedMembers, (err, result) => {
+      if (err) {
+        throw err
+      } else {
+        console.log(result)
+        console.log("Usernames fetched Successfully")
+        res.send(result)
+        return
+      }
+    })
+  }
 }
 
 exports.adminUpdateUser = async (req, res) => {

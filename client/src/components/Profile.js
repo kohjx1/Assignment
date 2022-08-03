@@ -7,7 +7,7 @@ import DispatchContext from "../DispatchContext"
 import StateContext from "../StateContext"
 
 function Profile() {
-  const paperStyle = { padding: 10, height: "65vh", width: 400, margin: "20px auto" }
+  const paperStyle = { padding: 20, height: 450, width: 400, margin: "20px auto", top: "50%", left: "50%" }
   const avatarStyle = { background: "#94128a" }
   const inputStyle = { height: 80 }
   // const navigate = useNavigate()
@@ -35,10 +35,52 @@ function Profile() {
     setErrors("")
   }
 
-  async function updateCredentials(e) {
+  async function updateAllCredentials(e) {
     e.preventDefault()
     try {
-      const response = await Axios.post("http://localhost:8080/update", { username: currentUser, email: email, password: password })
+      const response = await Axios.post("http://localhost:8080/updateEmailPass", { username: currentUser, email: email, password: password })
+
+      const err = response.data.errors
+      if (err) {
+        setErrors(err)
+      } else {
+        setSuccess(true)
+        handleClickSuccess()
+        // set new token based on new password auth
+        appDispatch({ type: "newToken", data: response.token })
+      }
+      return
+    } catch (e) {
+      console.log("There was a problem")
+      return
+    }
+  }
+
+  async function updatePassword(e) {
+    e.preventDefault()
+    try {
+      const response = await Axios.post("http://localhost:8080/updatePassword", { username: currentUser, password: password })
+
+      const err = response.data.errors
+      if (err) {
+        setErrors(err)
+      } else {
+        setSuccess(true)
+        handleClickSuccess()
+        // set new token based on new password auth
+        appDispatch({ type: "newToken", data: response.token })
+      }
+      return
+    } catch (e) {
+      console.log("There was a problem")
+      return
+    }
+  }
+
+  async function updateEmail(e) {
+    e.preventDefault()
+    try {
+      const response = await Axios.post("http://localhost:8080/updateEmail", { username: currentUser, email: email })
 
       const err = response.data.errors
       if (err) {
@@ -77,7 +119,6 @@ function Profile() {
           <h2>Update Credentials</h2>
         </Grid>
         <h2></h2>
-
         <TextField
           value={email}
           label="Email"
@@ -91,7 +132,6 @@ function Profile() {
           error={getError(error, "email") ? true : false}
           helperText={getError(error, "email")}
         />
-
         <h2></h2>
         <TextField
           value={password}
@@ -109,9 +149,19 @@ function Profile() {
         <br></br>
         <br></br>
         <br></br>
-        <Button type="submit" color="primary" variant="contained" fullWidth onClick={updateCredentials}>
-          Update
-        </Button>
+        {password && !email ? (
+          <Button type="submit" color="primary" variant="contained" fullWidth onClick={updatePassword}>
+            Update Password
+          </Button>
+        ) : !password && email ? (
+          <Button type="submit" color="primary" variant="contained" fullWidth onClick={updateEmail}>
+            Update Email
+          </Button>
+        ) : (
+          <Button type="submit" color="primary" variant="contained" fullWidth onClick={updateAllCredentials}>
+            Update both
+          </Button>
+        )}
         {/* <Link to="/Signup">Sign up</Link> */}
       </Paper>
     </Grid>

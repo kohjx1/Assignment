@@ -5,22 +5,35 @@ import Axios from "axios"
 // import Box from "@mui/material/Box"
 import { DataGrid } from "@mui/x-data-grid"
 import CloseIcon from "@mui/icons-material/Close"
+import ModeTwoToneIcon from "@mui/icons-material/ModeTwoTone"
 
 function CreateGroup() {
   const fontProps = { style: { fontSize: 17.5 }, sx: { height: 45 } }
   const buttonProps = { backgroundColor: "#94128a", "&:hover": { backgroundColor: "#333" } }
+  const tableButtonProps = { backgroundColor: "#94128a", "&:hover": { backgroundColor: "#333" }, maxHeight: "27px" }
   const gridStyles = { paddingTop: 0 }
   const style = {
     position: "absolute",
     top: "50%",
-    left: "80%",
-    transform: "translate(-60%, -45%)",
+    left: "50%",
+    transform: "translate(-50%, -50%)",
     width: 600,
     height: 500,
     bgcolor: "background.paper",
+    backgroundColor: "#333",
     border: "2px solid #000",
     boxShadow: 24,
     p: 4
+  }
+  const closebutton = {
+    cursor: "pointer",
+    float: "right",
+    marginTop: "3px",
+    backgroundColor: "white",
+    "&:hover": {
+      color: "#94128a",
+      backgroundColor: "white"
+    }
   }
 
   const [open, setOpen] = useState(false)
@@ -48,28 +61,33 @@ function CreateGroup() {
     for (var j = 0; j < users.length; j++) {
       // get username
       // console.log(users[j].username)
+      if (users[j].username === "") {
+        continue
+      }
       member.push(users[j].username)
     }
+
     temp.push({ id: i, UserGroup: groupName, Members: member })
   }
-  // console.log(temp)
+  console.log(temp)
 
   const columns = [
     { field: "id", headerName: "id", type: "number", width: 90 },
     { field: "UserGroup", headerName: "UserGroup", type: "string", width: 150 },
-    { field: "Members", headerName: "Members", width: 300 },
+    { field: "Members", headerName: "Members", width: 400 },
     {
       field: "Edit",
       renderCell: cellValues => {
         return (
           <Button
+            sx={tableButtonProps}
             variant="contained"
             color="primary"
             onClick={event => {
               handleClick(event, cellValues)
             }}
           >
-            Edit
+            <ModeTwoToneIcon />
           </Button>
         )
       }
@@ -225,7 +243,7 @@ function CreateGroup() {
 
   // console.log(selectedGroup)
   const [checked, setChecked] = useState([])
-  const [left, setLeft] = useState([0, 1, 2, 3])
+  const [left, setLeft] = useState([])
   const [right, setRight] = useState([])
 
   const leftChecked = intersection(checked, left)
@@ -340,27 +358,27 @@ function CreateGroup() {
         {/* <Button onClick={handleOpen}>Open modal</Button> */}
         <Modal keepMounted open={open} onClose={handleClose} aria-labelledby="keep-mounted-modal-title" aria-describedby="keep-mounted-modal-description">
           <Box sx={style}>
-            <Grid container direction="row" justify="space-between" alignItems="center">
-              <h2></h2>
-              <IconButton edge="start" onClick={handleClose}>
-                <CloseIcon />
-              </IconButton>
-            </Grid>
+            <IconButton onClick={handleClose} sx={closebutton}>
+              <CloseIcon />
+            </IconButton>
 
             <Grid container spacing={2} justifyContent="center" alignItems="center">
-              <Grid item>{customList("Choices", left)}</Grid>
+              <Grid item>{customList("Not In Group", left)}</Grid>
               <Grid item>
                 <Grid container direction="column" alignItems="center">
-                  <Button sx={{ my: 0.5 }} variant="outlined" size="small" onClick={handleCheckedRight} disabled={leftChecked.length === 0} aria-label="move selected right">
+                  <Button sx={{ my: 0.5, color: "white", border: "1px solid" }} variant="outlined" size="small" onClick={handleCheckedRight} disabled={leftChecked.length === 0} aria-label="move selected right">
                     &gt;
                   </Button>
-                  <Button sx={{ my: 0.5 }} variant="outlined" size="small" onClick={handleCheckedLeft} disabled={rightChecked.length === 0} aria-label="move selected left">
+                  <Button sx={{ my: 0.5, color: "white", border: "1px solid" }} variant="outlined" size="small" onClick={handleCheckedLeft} disabled={rightChecked.length === 0} aria-label="move selected left">
                     &lt;
                   </Button>
                 </Grid>
               </Grid>
-              <Grid item>{customList("Chosen", right)}</Grid>
+              <Grid item>{customList("In Group", right)}</Grid>
             </Grid>
+            <h2 class="selectedGroup">
+              <strong>{selectedGroup}</strong>
+            </h2>
           </Box>
         </Modal>
 
@@ -394,7 +412,7 @@ function CreateGroup() {
 
         <Grid item>
           <Grid container direction="row" alignItems="center" justifyContent="center" spacing={5}>
-            <Box sx={{ height: 400, width: 1000, paddingLeft: 5 }}>
+            <Box sx={{ height: 400, width: 700, paddingLeft: 5 }}>
               <DataGrid
                 density="compact"
                 initialState={{
@@ -405,14 +423,8 @@ function CreateGroup() {
                     }
                   }
                 }}
-                // editMode="row"
-                // processRowUpdate={updateSingleRow}
-                // experimentalFeatures={{ newEditingApi: true }}
-                // onProcessRowUpdateError={error => error}
                 columns={columns}
                 rows={temp}
-                // onCellClick={handleCellClick}
-                // onRowClick={handleRowClick}
               />
             </Box>
           </Grid>

@@ -1,5 +1,5 @@
 // When client sends request, need to determine how server will respond
-const { create, auth, findAll, findOne, userUpdate, adminUpdateUser, getUsers } = require("../controllers/userController")
+const { updateEmail, updatePassword, create, auth, findAll, findOne, adminUpdateUser, getUsers, emailPassUpdate } = require("../controllers/userController")
 const { checkGroup, createGroup, viewGroup, groupInsertUsers, groupDeleteUsers } = require("../controllers/groupController")
 
 const { validateEmail, validateUsername, validatePassword, validateGroupname } = require("../validation/validation")
@@ -9,7 +9,12 @@ const router = express.Router()
 
 // Created Connection
 router.route("/createUser").post([validateEmail, validatePassword, validateUsername], create)
-router.route("/update").post([validateEmail, validatePassword], userUpdate)
+router.route("/updateEmailPass").post([validateEmail, validatePassword], emailPassUpdate)
+router.route("/updateEmail").post([validateEmail], updateEmail)
+router.route("/updatePassword").post([validatePassword], updatePassword)
+// updateEmail
+// updatePass
+
 router.route("/login").post(auth)
 router.route("/checkGroup").post(checkGroup)
 router.route("/users").get(findAll)

@@ -25,7 +25,10 @@ function Table() {
   const [errorCreate, setErrorsCreate] = useState("")
   const [successCreate, setSuccessCreate] = useState(false)
   const [failCreate, setFailCreate] = useState(false)
+  const [selectionModel, setSelectionModel] = useState(temp)
+  const [boo, setBoo] = useState(false)
 
+  console.log(selectionModel)
   const handleClickSuccess = () => {
     setEmail("")
     setUsername("")
@@ -35,7 +38,7 @@ function Table() {
 
   // collecting all user data on generate
   var rows = data
-  console.log(rows)
+  // console.log(rows)
   // manipulate data to hide password
   var temp = []
   for (var i = 0; i < rows.length; i++) {
@@ -164,7 +167,7 @@ function Table() {
 
   const currentUser = appState.user.username
   return (
-    <Grid container direction={"column"} spacing={3}>
+    <Grid container direction={"column"} spacing={4}>
       <Collapse in={fail}>
         <Alert severity="warning">
           <AlertTitle>
@@ -182,98 +185,129 @@ function Table() {
       <Collapse in={successCreate}>
         <Alert severity="success">Created New User Successfully</Alert>
       </Collapse>
-
+      <Grid container direction={"column"} spacing={4}></Grid>
       {/* <Grid item> */}
-      <h2 className="intromsg">
-        Welcome to your Dashboard, <strong>{currentUser.toUpperCase()}</strong> !
-      </h2>
-      {/* </Grid> */}
-
       <Grid item>
-        <Grid container sx={gridStyles} direction={"row"} spacing={5}>
-          <Grid item>
-            <TextField
-              InputProps={fontProps}
-              InputLabelProps={fontProps}
-              value={username}
-              label="Username"
-              placeholder="Enter Username"
-              required
-              onChange={e => {
-                setUsername(e.target.value)
-              }}
-              error={getError(errorCreate, "username") ? true : false}
-              helperText={getError(errorCreate, "username")}
-            />
-          </Grid>
-          <Grid item>
-            <TextField
-              InputProps={fontProps}
-              InputLabelProps={fontProps}
-              value={email}
-              label="Email"
-              placeholder="Enter Email"
-              required
-              onChange={e => {
-                setEmail(e.target.value)
-              }}
-              error={getError(errorCreate, "email") ? true : false}
-              helperText={getError(errorCreate, "email")}
-            />
-          </Grid>
-          <Grid item>
-            <TextField
-              InputProps={fontProps}
-              InputLabelProps={fontProps}
-              value={password}
-              label="Password"
-              placeholder="Enter Password"
-              type="password"
-              required
-              onChange={e => {
-                setPassword(e.target.value)
-              }}
-              error={getError(errorCreate, "password") ? true : false}
-              helperText={getError(errorCreate, "password")}
-            />
-          </Grid>
-          <Grid item>
-            <Button sx={buttonProps} type="submit" color="primary" variant="contained" fullWidth onClick={addUser}>
-              Create
-            </Button>
-          </Grid>
-        </Grid>
+        <h2 className="intromsg">
+          Welcome to the User Management Dashboard, <strong>{currentUser.toUpperCase()}</strong> !
+        </h2>
       </Grid>
-      {/* <div className="intromsg">
+      {/* </Grid> */}
+      <Grid item>
+        <Grid container direction={"row"} spacing={1}>
+          <Grid item></Grid>
+          <Box>
+            <Grid container direction={"column"} spacing={3}>
+              <Grid item>
+                <Grid container sx={gridStyles} direction={"row"} alignItems="center" justifyContent="center" spacing={5}>
+                  <Grid item>
+                    <TextField
+                      InputProps={fontProps}
+                      InputLabelProps={fontProps}
+                      value={username}
+                      label="Username"
+                      placeholder="Enter Username"
+                      required
+                      onChange={e => {
+                        setUsername(e.target.value)
+                      }}
+                      error={getError(errorCreate, "username") ? true : false}
+                      helperText={getError(errorCreate, "username")}
+                    />
+                  </Grid>
+                  <Grid item>
+                    <TextField
+                      InputProps={fontProps}
+                      InputLabelProps={fontProps}
+                      value={email}
+                      label="Email"
+                      placeholder="Enter Email"
+                      required
+                      onChange={e => {
+                        setEmail(e.target.value)
+                      }}
+                      error={getError(errorCreate, "email") ? true : false}
+                      helperText={getError(errorCreate, "email")}
+                    />
+                  </Grid>
+                  <Grid item>
+                    <TextField
+                      InputProps={fontProps}
+                      InputLabelProps={fontProps}
+                      value={password}
+                      label="Password"
+                      placeholder="Enter Password"
+                      type="password"
+                      required
+                      onChange={e => {
+                        setPassword(e.target.value)
+                      }}
+                      error={getError(errorCreate, "password") ? true : false}
+                      helperText={getError(errorCreate, "password")}
+                    />
+                  </Grid>
+                  <Grid item>
+                    <Button sx={buttonProps} type="submit" color="primary" variant="contained" fullWidth onClick={addUser}>
+                      Create
+                    </Button>
+                  </Grid>
+                </Grid>
+              </Grid>
+              {/* <div className="intromsg">
         <button name="button" onClick={getData}>
           Generate
         </button>
       </div> */}
-      <Grid item>
-        <Box sx={{ height: 400, width: 1000, paddingLeft: 5 }}>
-          <DataGrid
-            density="compact"
-            initialState={{
-              sorting: { sortModel: [{ field: "id", sort: "desc" }] },
-              columns: {
-                columnVisibilityModel: {
-                  id: false
-                }
-              }
-            }}
-            components={{
-              LoadingOverlay: LinearProgress
-            }}
-            // Loading
-            // {...rows}
-            editMode="row"
-            processRowUpdate={updateSingleRow}
-            experimentalFeatures={{ newEditingApi: true }}
-            onProcessRowUpdateError={error => error}
-            columns={columns}
-            rows={temp}
-          />
-        </Box>
+              {/* <Grid container sx={gridStyles} direction={"row"} alignItems="center" justifyContent="center" spacing={5}> */}
+              <Grid item>
+                <Box sx={{ height: 400, width: 1000, paddingLeft: 5 }}>
+                  <DataGrid
+                    density="compact"
+                    initialState={{
+                      sorting: { sortModel: [{ field: "id", sort: "desc" }] },
+                      columns: {
+                        columnVisibilityModel: {
+                          id: false
+                        }
+                      }
+                    }}
+                    components={{
+                      LoadingOverlay: LinearProgress
+                    }}
+                    // Loading
+                    // {...rows}
+                    editMode="row"
+                    processRowUpdate={updateSingleRow}
+                    experimentalFeatures={{ newEditingApi: true }}
+                    onProcessRowUpdateError={error => error}
+                    checkboxSelection={boo}
+                    selectionModel={selectionModel}
+                    onSelectionModelChange={setSelectionModel}
+                    columns={columns}
+                    rows={temp}
+                  />
+                </Box>
+              </Grid>
+            </Grid>
+            {/* </Grid> */}
+          </Box>
+          <Grid item>
+            <Box>
+              <Grid>
+                <Grid item>
+                  <Button>Toggle Checkbox</Button>
+                </Grid>
+                <Grid item>
+                  <Button>Bulk Edit</Button>
+                </Grid>
+                <Grid item>Assign Group</Grid>
+                <Grid item>Update Email</Grid>
+                <Grid item>Update Password</Grid>
+                <Grid item>Update Status</Grid>
+              </Grid>
+            </Box>
+          </Grid>
+        </Grid>
       </Grid>
     </Grid>
   )

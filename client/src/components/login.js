@@ -9,7 +9,7 @@ import StateContext from "../StateContext"
 import { computeColumnTypes } from "@mui/x-data-grid/hooks/features/columns/gridColumnsUtils"
 
 function login() {
-  const paperStyle = { padding: 10, height: "65vh", width: 400, margin: "20px auto" }
+  const paperStyle = { padding: 10, height: 450, width: 400, margin: "20px auto", top: "50%", left: "50%" }
   const avatarStyle = { background: "#94128a" }
   const inputStyle = { height: 80 }
   const navigate = useNavigate()

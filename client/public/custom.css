@@ -17,5 +17,14 @@ a.pointer {
 }
 
 .intromsg {
-  padding-left: 300px;
+  text-align: center;
+}
+
+.justify-to-right {
+  justify-content: flex-end;
+}
+
+.selectedGroup {
+  color: white;
+  text-align: center;
 }
