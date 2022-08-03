@@ -7,6 +7,7 @@ import { useImmerReducer } from "use-immer"
 
 import { BrowserRouter as Router, Route, Routes } from "react-router-dom"
 
+import Home from "./components/Home"
 import Login from "./components/Login"
 import Navbar from "./components/NavBar"
 import UserManagement from "./components/UserManagement"
@@ -14,22 +15,19 @@ import Dashboard from "./components/Dashboard"
 import CreateUser from "./components/CreateUser"
 import EditUser from "./components/EditUser"
 import DisableUser from "./components/DisableUser"
+import ErrorPage from "./components/ErrorPage"
 
 import GroupManagement from "./components/GroupManagement"
 import ViewGroupManagement from "./components/ViewGroupManagement"
 import AssignGroupManagement from "./components/AssignGroupManagement"
-
+import CreateGroup from "./components/CreateGroup"
 import Profile from "./components/Profile"
 
-import FlashMessages from "./components/FlashMessages"
-
-import AdminRoutes from "./components/authRoutes/AdminRoutes"
+import ProtectedRoutes from "./components/authRoutes/ProtectedRoutes"
 
 function App() {
   const initialState = {
     loggedIn: Boolean(sessionStorage.getItem("token")),
-    flashMessages: [],
-    isAdmin: false,
     user: {
       token: sessionStorage.getItem("token"),
       username: sessionStorage.getItem("username")
@@ -51,10 +49,6 @@ function App() {
       case "newToken":
         draft.user.token = action.value
         return
-
-      case "flashMessage":
-        draft.flashMessages.push(action.value)
-        return
     }
   }
 
@@ -67,6 +61,7 @@ function App() {
     } else {
       sessionStorage.removeItem("token")
       sessionStorage.removeItem("username")
+      sessionStorage.removeItem("role")
     }
   }, [state.loggedIn])
 
@@ -75,23 +70,28 @@ function App() {
       <DispatchContext.Provider value={dispatch}>
         <Router>
           {state.loggedIn ? <Navbar /> : ""}
-          <FlashMessages messages={state.flashMessages} />
+
           <Routes>
+            {/* public routes */}
             <Route path="/" element={<Login />} />
+            <Route path="/Unauthorized" element={<ErrorPage />} />
 
-            <Route element={<AdminRoutes />}>
+            {/* protected routes */}
+            <Route element={<ProtectedRoutes allowedRoles={["admin", "user"]} />}>
+              <Route path="/Home" element={<Home />} />
+              <Route path="/Profile" element={<Profile />} />
+            </Route>
+
+            <Route element={<ProtectedRoutes allowedRoles={["admin"]} />}>
               <Route path="/Dashboard" element={<Dashboard />} />
-
               <Route path="/UserManagement" element={<UserManagement />} />
               <Route path="/UserManagement/CreateUser" element={<CreateUser />} />
               <Route path="/UserManagement/EditUser" element={<EditUser />} />
               <Route path="/UserManagement/DisableUser" element={<DisableUser />} />
-
               <Route path="/GroupManagement" element={<GroupManagement />} />
+              <Route path="/GroupManagement/Create" element={<CreateGroup />} />
               <Route path="/GroupManagement/View" element={<ViewGroupManagement />} />
               <Route path="/GroupManagement/Assign" element={<AssignGroupManagement />} />
-
-              <Route path="/Profile" element={<Profile />} />
             </Route>
           </Routes>
         </Router>

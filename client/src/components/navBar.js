@@ -48,6 +48,9 @@ const Navbar = () => {
               </a>
               <ul className="dropdown-menu">
                 <li>
+                  <Link to="/GroupManagement/Create">Create Group</Link>
+                </li>
+                <li>
                   <Link to="/GroupManagement/View">View Group</Link>
                 </li>
                 <li>

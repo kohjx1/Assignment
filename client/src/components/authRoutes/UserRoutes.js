@@ -10,9 +10,9 @@ function UserRoutes() {
 
   // // get current logged in user
   // const currentUser = appState.user.username
-  let auth = { token: true, isUser: true }
+  let auth = { token: true, isAdmin: false }
 
-  return auth.token && auth.isUser ? <Outlet /> : <Navigate to="/login" />
+  return auth.token && auth.isUser ? <Outlet /> : <Navigate to="/Home" />
 }
 
 export default UserRoutes

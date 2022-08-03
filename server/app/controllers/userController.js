@@ -1,5 +1,5 @@
 const db = require("../models/dbcon")
-const { validationResult } = require("express-validator")
+const { validationResult, check } = require("express-validator")
 const { validEmail } = require("../validation/Regex")
 
 var path = require("path")
@@ -107,23 +107,6 @@ exports.userUpdate = async (req, res) => {
   }
 }
 
-// Check if user belongs to particular group
-exports.checkGroup = (req, res) => {
-  // Init values from the front end
-  const { username, groupname } = req.body
-
-  let sql = `Select * FROM nodelogin.groups Where username = ?`
-  db.query(sql, [username], (err, result) => {
-    if (err) throw err
-
-    if (result[0].groupname === groupname) {
-      return res.json({ inGroup: true })
-    } else {
-      return res.json({ inGroup: false })
-    }
-  })
-}
-
 // Looking up all users
 exports.findAll = function (req, res) {
   let sql = "SELECT * FROM accounts"
@@ -132,6 +115,29 @@ exports.findAll = function (req, res) {
     console.log("Users Fetched Successfully")
     res.send(result)
     return
+  })
+}
+
+exports.getUsers = (req, res) => {
+  const { selectedMembers } = req.body
+  console.log(selectedMembers)
+
+  let sql = "SELECT `username` FROM accounts where `username` not in ("
+  for (var i = 0; i < selectedMembers.length; i++) {
+    sql = sql + "?,"
+  }
+  sql = sql.substring(0, sql.length - 1)
+  sql = sql + ")"
+
+  db.query(sql, selectedMembers, (err, result) => {
+    if (err) {
+      throw err
+    } else {
+      console.log(result)
+      console.log("Usernames fetched Successfully")
+      res.send(result)
+      return
+    }
   })
 }
 
@@ -194,49 +200,6 @@ exports.adminUpdateUser = async (req, res) => {
     }
   }
 }
-
-// else if admin edited pw cell --> oldpw !== password
-
-// const { id, password, email, status, oldpw } = req.body
-// // if password is not changed or touched
-// if (password === oldpw) {
-//   const errors = validationResult(req)
-//   console.log(errors)
-
-//   // check if there are any validationerrors
-//   if (!errors.isEmpty()) {
-//     return res.send(errors)
-//   } else {
-
-//     let sql = `UPDATE accounts SET email = ?, password = ?, status = ? WHERE id = ?`
-//     db.query(sql, [email, hashedPassword, status, id], (err, result) => {
-//       if (err) {
-//         throw err
-//       } else {
-//         // send new token, remove old token, set new token as state token
-//         res.json({ message: "Updated Successfully" })
-
-//         console.log("User Data Updated Successfully")
-//       }
-//     })
-//   }
-// } else {
-//   // if password is changed by admin
-//   // hash the new password and update database
-//   let hashedPassword = await bcrypt.hash(password, salt)
-//   let sql = `UPDATE accounts SET email = ?, password=?, status = ? WHERE id = ?`
-//     db.query(sql, [email, hashedPassword, status, id], (err, result) => {
-//       if (err) {
-//         throw err
-//       } else {
-//         // send new token, remove old token, set new token as state token
-//         res.json({ message: "Updated Successfully" })
-
-//         console.log("User Data Updated Successfully")
-//       }
-//     })
-//   return
-// }
 
 // Looking up specific user only
 exports.findOne = function (req, res) {

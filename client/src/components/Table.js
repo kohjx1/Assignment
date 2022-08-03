@@ -12,7 +12,7 @@ function Table() {
 
   const gridStyles = { paddingLeft: 5 }
   const fontProps = { style: { fontSize: 17.5 }, sx: { height: 45 } }
-  const buttonProps = { backgroundColor: "#94128a" }
+  const buttonProps = { backgroundColor: "#94128a", "&:hover": { backgroundColor: "#333" } }
 
   const [data, setData] = useState("")
   const [error, setErrors] = useState("")
@@ -30,7 +30,7 @@ function Table() {
     setEmail("")
     setUsername("")
     setPassword("")
-    setErrors("")
+    setErrorsCreate("")
   }
 
   // collecting all user data on generate
@@ -75,7 +75,7 @@ function Table() {
     const timeout = setTimeout(() => {
       setFail(false)
       setErrors("")
-    }, 500)
+    }, 1000)
 
     return () => clearTimeout(timeout)
   }, [fail])
@@ -84,10 +84,10 @@ function Table() {
     const timeout = setTimeout(() => {
       setFailCreate(false)
       setErrorsCreate("")
-    }, 500)
+    }, 1500)
 
     return () => clearTimeout(timeout)
-  }, [failCreate])
+  }, [errorCreate])
 
   useEffect(() => {
     getData()

@@ -15,6 +15,19 @@ function isUsernameInUse(username) {
   })
 }
 
+function isGroupnameInUse(groupname) {
+  return new Promise((resolve, reject) => {
+    let sql = `SELECT COUNT(*) AS total FROM nodelogin.groups WHERE LOWER(groupname) = ?`
+    db.query(sql, [groupname], (err, result) => {
+      if (!err) {
+        return resolve(result[0].total > 0)
+      } else {
+        return reject(new Error("Database Error"))
+      }
+    })
+  })
+}
+
 module.exports = {
   validateEmail: check("email").trim().notEmpty().withMessage("You have to enter an Email Address").isEmail().withMessage("Invalid Email Address"),
   validateUsername: check("username")
@@ -39,7 +52,17 @@ module.exports = {
     .matches(/[!@#$%^&*(),.?":{}|<>]/)
     .withMessage("your password should have at least one sepcial character")
     .matches(/[a-zA-Z]/)
-    .withMessage("your password should have at least one alphabet")
-  // .matches(/^[A-Za-z0-9 .,'!&]+$/, "g")
-  // .withMessage("Password must contain letters, numbers and special characters")
+    .withMessage("your password should have at least one alphabet"),
+
+  validateGroupname: check("groupname")
+    .trim()
+    .notEmpty()
+    .withMessage("You have to enter a unique name")
+    .custom(async groupname => {
+      const value = await isGroupnameInUse(groupname)
+      if (value) {
+        throw new Error("Groupname is already in use")
+      }
+    })
+    .withMessage("Groupname already in use")
 }

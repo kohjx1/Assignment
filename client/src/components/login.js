@@ -5,6 +5,8 @@ import KeyIcon from "@mui/icons-material/Key"
 import { Link } from "react-router-dom"
 import Axios from "axios"
 import DispatchContext from "../DispatchContext"
+import StateContext from "../StateContext"
+import { computeColumnTypes } from "@mui/x-data-grid/hooks/features/columns/gridColumnsUtils"
 
 function login() {
   const paperStyle = { padding: 10, height: "65vh", width: 400, margin: "20px auto" }
@@ -12,13 +14,14 @@ function login() {
   const inputStyle = { height: 80 }
   const navigate = useNavigate()
   const appDispatch = useContext(DispatchContext)
-  // const appState = useContext(StateContext)
+  const appState = useContext(StateContext)
 
   const [username, setUsername] = useState("")
   const [password, setPassword] = useState("")
   const [error, setErrors] = useState("")
   const [success, setSuccess] = useState(false)
   const [fail, setFail] = useState(false)
+  const [role, setRole] = useState("")
   // const [error, setErrors] = useState("")
 
   useEffect(() => {
@@ -37,21 +40,41 @@ function login() {
     return () => clearTimeout(timeout)
   }, [fail])
 
+  async function getUserGroup(username, role) {
+    const response = await Axios.post("http://localhost:8080/checkGroup", { username: username, groupname: role })
+    if (response.data.inGroup === true) {
+      return sessionStorage.setItem("role", "admin")
+    } else if (response.data.inGroup === false) {
+      return sessionStorage.setItem("role", "user")
+    }
+    return
+  }
+
   async function login(e) {
     // e.preventDefault()
+
     try {
       const response = await Axios.post("http://localhost:8080/login", { username: username, password: password })
+      const responseGrp = await Axios.post("http://localhost:8080/checkGroup", { username: username, groupname: "admin" })
 
       const data = response.data
+      const isAdmin = responseGrp.data.inGroup
+      console.log(data)
+      console.log(isAdmin)
+
       if (data.errors) {
         setErrors(data.errors[0].msg)
         setFail(true)
       } else {
-        // appDispatch({ type: "flashMessage", value: "Successfully Logged In" })
-
         appDispatch({ type: "login", data: response.data })
         setSuccess(true)
-        navigate("/Dashboard")
+
+        if (isAdmin) {
+          sessionStorage.setItem("role", "admin")
+        } else {
+          sessionStorage.setItem("role", "user")
+        }
+        navigate("/Home")
       }
       return
     } catch (e) {
@@ -59,6 +82,24 @@ function login() {
       return
     }
   }
+
+  // async function getUserGroup(e, username, role) {
+  //   // e.preventDefault()
+  //   try {
+  //     // console.log(state.user.username)
+  //     const response = await Axios.post("http://localhost:8080/checkGroup", { username: username, groupname: role })
+  //     const responseGrp = await Axios.post("http://localhost:8080/checkGroup", { username: username, groupname: role })t
+  //     console.log(response.data)
+  //     if (response.data.inGroup === true) {
+  //       return "admin"
+  //     } else if (response.data.inGroup === false) {
+  //       return "user"
+  //     }
+  //   } catch (e) {
+  //     console.log("There was a problem")
+  //   }
+  //   return
+  // }
 
   return (
     <Grid>
