@@ -376,7 +376,7 @@ function CreateGroup() {
               </Grid>
               <Grid item>{customList("In Group", right)}</Grid>
             </Grid>
-            <h2 class="selectedGroup">
+            <h2 className="selectedGroup">
               <strong>{selectedGroup}</strong>
             </h2>
           </Box>

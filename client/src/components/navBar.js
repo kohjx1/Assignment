@@ -21,16 +21,17 @@ const Navbar = () => {
       <nav className="navbar navbar-inverse">
         <div className="container-fluid">
           <div className="navbar-header">
-            <Link to="/Dashboard" className="navbar-brand">
+            <Link to="/Home" className="navbar-brand">
               <span></span> Kanban
             </Link>
           </div>
           <ul className="nav navbar-nav">
             <li className="dropdown">
               <a className="dropdown-toggle pointer " data-toggle="dropdown">
-                User Management<span className="caret"></span>
+                <Link to="/Dashboard">User Management</Link>
+                {/* <span className="caret"></span> */}
               </a>
-              <ul className="dropdown-menu">
+              {/* <ul className="dropdown-menu">
                 <li>
                   <Link to="/UserManagement/createUser">Create User</Link>
                 </li>
@@ -40,13 +41,14 @@ const Navbar = () => {
                 <li>
                   <Link to="/UserManagement/DisableUser">Disable User</Link>
                 </li>
-              </ul>
+              </ul> */}
             </li>
             <li className="dropdown">
               <a className="dropdown-toggle pointer" data-toggle="dropdown">
-                Group Management<span className="caret"></span>
+                <Link to="/GroupManagement/Create">Group Management</Link>
+                {/* <span className="caret"></span> */}
               </a>
-              <ul className="dropdown-menu">
+              {/* <ul className="dropdown-menu">
                 <li>
                   <Link to="/GroupManagement/Create">Create Group</Link>
                 </li>
@@ -56,7 +58,7 @@ const Navbar = () => {
                 <li>
                   <Link to="/GroupManagement/Assign">Assign Group</Link>
                 </li>
-              </ul>
+              </ul> */}
             </li>
           </ul>
           <ul className="nav navbar-nav navbar-right">
