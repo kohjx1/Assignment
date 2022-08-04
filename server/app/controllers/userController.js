@@ -59,7 +59,7 @@ exports.auth = (req, res) => {
 
       let isMatch = await bcrypt.compare(password, dbpassword)
 
-      if (!isMatch) {
+      if (!isMatch || result[0].status === 0) {
         return res.json({ errors: [{ msg: "Username or Password is Incorrect" }] })
       }
       // if passwords match, authenticate
