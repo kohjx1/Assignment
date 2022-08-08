@@ -25,13 +25,14 @@ const Navbar = () => {
               <span></span> Kanban
             </Link>
           </div>
-          <ul className="nav navbar-nav">
-            <li className="dropdown">
-              <a className="dropdown-toggle pointer " data-toggle="dropdown">
-                <Link to="/Dashboard">User Management</Link>
-                {/* <span className="caret"></span> */}
-              </a>
-              {/* <ul className="dropdown-menu">
+          {sessionStorage.getItem("role") === "admin" ? (
+            <ul className="nav navbar-nav">
+              <li className="dropdown">
+                <a className="dropdown-toggle pointer " data-toggle="dropdown">
+                  <Link to="/Dashboard">User Management</Link>
+                  {/* <span className="caret"></span> */}
+                </a>
+                {/* <ul className="dropdown-menu">
                 <li>
                   <Link to="/UserManagement/createUser">Create User</Link>
                 </li>
@@ -42,13 +43,13 @@ const Navbar = () => {
                   <Link to="/UserManagement/DisableUser">Disable User</Link>
                 </li>
               </ul> */}
-            </li>
-            <li className="dropdown">
-              <a className="dropdown-toggle pointer" data-toggle="dropdown">
-                <Link to="/GroupManagement/Create">Group Management</Link>
-                {/* <span className="caret"></span> */}
-              </a>
-              {/* <ul className="dropdown-menu">
+              </li>
+              <li className="dropdown">
+                <a className="dropdown-toggle pointer" data-toggle="dropdown">
+                  <Link to="/GroupManagement/Create">Group Management</Link>
+                  {/* <span className="caret"></span> */}
+                </a>
+                {/* <ul className="dropdown-menu">
                 <li>
                   <Link to="/GroupManagement/Create">Create Group</Link>
                 </li>
@@ -59,8 +60,11 @@ const Navbar = () => {
                   <Link to="/GroupManagement/Assign">Assign Group</Link>
                 </li>
               </ul> */}
-            </li>
-          </ul>
+              </li>
+            </ul>
+          ) : (
+            ""
+          )}
           <ul className="nav navbar-nav navbar-right">
             <li>
               <Link to="/Profile">

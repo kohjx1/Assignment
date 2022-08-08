@@ -279,14 +279,14 @@ exports.adminUpdateUser = async (req, res) => {
 
 // Looking up specific user only
 exports.findOne = function (req, res) {
-  if (!req.params) {
+  if (!req.body) {
     res.status(400).send({
       message: "Please Enter a username before submitting request"
     })
   }
-  const user = req.params.username
-  if (user) {
-    let sql = `SELECT * FROM accounts WHERE username = '${user}'`
+  const { username } = req.body
+  if (username) {
+    let sql = `SELECT email FROM accounts WHERE username = '${username}'`
     db.query(sql, (err, result) => {
       if (err) throw err
       console.log("Found User Data Successfully")

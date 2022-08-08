@@ -1,8 +1,10 @@
 // When client sends request, need to determine how server will respond
 const { updateEmail, updatePassword, create, auth, findAll, findOne, adminUpdateUser, getUsers, emailPassUpdate } = require("../controllers/userController")
-const { checkGroup, createGroup, viewGroup, groupInsertUsers, groupDeleteUsers } = require("../controllers/groupController")
+const { checkGroup, getDistinctGroups, createGroup, viewGroup, groupInsertUsers, groupDeleteUsers, getOneUserGroupName } = require("../controllers/groupController")
 const { bulkUpdateEmail, bulkUpdatePassword, bulkUpdateStatus, bulkUpdateEmailPassword, bulkUpdatePasswordStatus, bulkUpdateEmailStatus, bulkUpdateEmailPasswordStatus } = require("../controllers/bulkEditController")
-const { validateEmail, validateUsername, validatePassword, validateGroupname } = require("../validation/validation")
+const { createApp } = require("../controllers/applicationController")
+
+const { validateEmail, validateUsername, validatePassword, validateGroupname, validateApplicationName } = require("../validation/validation")
 
 const express = require("express")
 const router = express.Router()
@@ -17,6 +19,7 @@ router.route("/updatePassword").post([validatePassword], updatePassword)
 
 router.route("/login").post(auth)
 router.route("/checkGroup").post(checkGroup)
+router.route("/getDistinctGroups").get(getDistinctGroups)
 router.route("/users").get(findAll)
 router.route("/updateUser").post([validatePassword], adminUpdateUser)
 router.route("/createGroup").post([validateGroupname], createGroup)
@@ -24,6 +27,8 @@ router.route("/getGroups").get(viewGroup)
 router.route("/getUsersOnly").post(getUsers)
 router.route("/updateGroupsForUser").post(groupInsertUsers)
 router.route("/removeGroupsFromUser").post(groupDeleteUsers)
+router.route("/getOneUserGroupName").post(getOneUserGroupName)
+router.route("/getUserEmail").post(findOne)
 
 router.route("/bulkUpdateEmail").post([validateEmail], bulkUpdateEmail)
 router.route("/bulkUpdatePassword").post([validatePassword], bulkUpdatePassword)
@@ -34,10 +39,12 @@ router.route("/bulkUpdatePasswordStatus").post([validatePassword], bulkUpdatePas
 router.route("/bulkUpdateEmailStatus").post([validateEmail], bulkUpdateEmailStatus)
 
 router.route("/bulkUpdateEmailPasswordStatus").post([validateEmail, validatePassword], bulkUpdateEmailPasswordStatus)
+
+router.route("/createApp").post([validateApplicationName], createApp)
+
 // Pending
 
 // Incomplete Connection
-router.route("/:username").get(findOne)
 
 // router.route("/update/:username").put(updateall)
 

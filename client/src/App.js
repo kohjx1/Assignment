@@ -4,10 +4,12 @@ import React, { useEffect, useState } from "react"
 import StateContext from "./StateContext"
 import DispatchContext from "./DispatchContext"
 import { useImmerReducer } from "use-immer"
+import { DndProvider } from "react-dnd"
+import { HTML5Backend } from "react-dnd-html5-backend"
 
 import { BrowserRouter as Router, Route, Routes } from "react-router-dom"
 
-import Home from "./components/Home"
+import Home from "./components/Board/Home"
 import Login from "./components/Login"
 import Navbar from "./components/NavBar"
 import UserManagement from "./components/UserManagement"
@@ -66,6 +68,7 @@ function App() {
   }, [state.loggedIn])
 
   return (
+    // <DndProvider backend={HTML5Backend}>
     <StateContext.Provider value={state}>
       <DispatchContext.Provider value={dispatch}>
         <Router>
@@ -75,10 +78,11 @@ function App() {
             {/* public routes */}
             <Route path="/" element={<Login />} />
             <Route path="/Unauthorized" element={<ErrorPage />} />
-
+            <Route path="*" element={<ErrorPage />} />
             {/* protected routes */}
             <Route element={<ProtectedRoutes allowedRoles={["admin", "user"]} />}>
               <Route path="/Home" element={<Home />} />
+
               <Route path="/Profile" element={<Profile />} />
             </Route>
 
@@ -97,6 +101,7 @@ function App() {
         </Router>
       </DispatchContext.Provider>
     </StateContext.Provider>
+    // </DndProvider>
   )
 }
 

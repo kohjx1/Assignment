@@ -29,6 +29,17 @@ exports.checkGroup = (req, res) => {
   })
 }
 
+exports.getDistinctGroups = (req, res) => {
+  let sql = "SELECT DISTINCT `groupname` from nodelogin.groups"
+  db.query(sql, (err, result) => {
+    if (err) {
+      throw err
+    } else {
+      res.send(result)
+    }
+  })
+}
+
 // Creating new group
 exports.createGroup = async (req, res) => {
   const { groupname } = req.body
@@ -100,6 +111,23 @@ exports.groupDeleteUsers = (req, res) => {
     } else {
       console.log("Successfully removed user's previous groups")
       res.send("Successfully removed user's previous groups")
+      return
+    }
+  })
+}
+
+exports.getOneUserGroupName = (req, res) => {
+  const { username } = req.body
+  console.log(username)
+  let sql = "SELECT `groupname` FROM nodelogin.groups WHERE `username` in (?)"
+  db.query(sql, username, (err, result) => {
+    if (err) {
+      console.log("no group")
+      res.send([])
+      // throw err
+    } else {
+      console.log("Successfully fetched userGroup")
+      res.send(result)
       return
     }
   })

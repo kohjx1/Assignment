@@ -28,6 +28,19 @@ function isGroupnameInUse(groupname) {
   })
 }
 
+function isApplicationNameInUse(name) {
+  return new Promise((resolve, reject) => {
+    let sql = `SELECT COUNT(*) AS total FROM nodelogin.application WHERE LOWER(App_Acronym) = ?`
+    db.query(sql, [name], (err, result) => {
+      if (!err) {
+        return resolve(result[0].total > 0)
+      } else {
+        return reject(new Error("Database Error"))
+      }
+    })
+  })
+}
+
 module.exports = {
   validateEmail: check("email").trim().notEmpty().withMessage("You have to enter an Email Address").isEmail().withMessage("Invalid Email Address"),
   validateUsername: check("username")
@@ -64,5 +77,17 @@ module.exports = {
         throw new Error("Groupname is already in use")
       }
     })
-    .withMessage("Groupname already in use")
+    .withMessage("Groupname already in use"),
+
+  validateApplicationName: check("name")
+    .trim()
+    .notEmpty()
+    .withMessage("You have to enter a unique application name")
+    .custom(async name => {
+      const value = await isApplicationNameInUse(name)
+      if (value) {
+        throw new Error("Application name is already in use")
+      }
+    })
+    .withMessage("Application name is already in use")
 }

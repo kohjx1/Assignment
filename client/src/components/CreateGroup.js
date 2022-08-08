@@ -350,6 +350,7 @@ function CreateGroup() {
 
   return (
     <>
+      <h2 className="intromsg">Group Management</h2>
       <Grid container direction="column" spacing={7} sx={gridStyles}>
         <Collapse in={success} className="parent">
           <Alert severity="success">Created New Group Successfully</Alert>
