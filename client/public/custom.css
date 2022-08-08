@@ -25,7 +25,9 @@ a.pointer {
   justify-content: flex-end;
 }
 
-.selectedGroup {
+.selectedGroup,
+.newApplication,
+.newTask {
   color: white;
   text-align: center;
 }

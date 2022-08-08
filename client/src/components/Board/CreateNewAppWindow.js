@@ -5,7 +5,7 @@ import Axios from "axios"
 //#root
 
 // whether to show the window, what you do when close window and the actual item and the data associated with the item
-const CreateWindow = ({ open, onClose }) => {
+const CreateNewAppWindow = ({ open, onClose }) => {
   const [name, setName] = useState("")
   const [description, setDescription] = useState("")
   const [projectLead, setprojectLead] = useState([])
@@ -123,6 +123,9 @@ const CreateWindow = ({ open, onClose }) => {
           <Alert severity="success">Created New User Successfully</Alert>
         </Collapse>
         <Grid container direction={"column"} spacing={2}>
+          <Grid item>
+            <h2 className="newApplication">New Application</h2>
+          </Grid>
           <Grid item>
             <TextField
               variant="filled"
@@ -250,7 +253,7 @@ const CreateWindow = ({ open, onClose }) => {
 
           <Grid item>
             <Button type="submit" color="primary" variant="contained" fullWidth onClick={addApplication}>
-              Submit
+              Create
             </Button>
           </Grid>
         </Grid>
@@ -259,4 +262,4 @@ const CreateWindow = ({ open, onClose }) => {
   )
 }
 
-export default CreateWindow
+export default CreateNewAppWindow

@@ -23,3 +23,65 @@ exports.createApp = (req, res) => {
     })
   }
 }
+
+exports.getApps = (req, res) => {
+  let sql = `SELECT * FROM nodelogin.application`
+  db.query(sql, (err, result) => {
+    if (err) {
+      throw err
+    } else {
+      console.log("Successfully retrieved apps")
+      res.send(result)
+    }
+  })
+}
+
+exports.getTaskID = (req, res) => {
+  const { name } = req.body
+  let sql = "SELECT `App_Acronym`, `App_Rnumber` FROM nodelogin.application WHERE `App_Acronym` = ?"
+  db.query(sql, [name], (err, result) => {
+    if (err) {
+      throw err
+    } else {
+      console.log("Retrieved taskID Successfully")
+      res.send(result)
+    }
+  })
+}
+
+exports.getPlans = (req, res) => {
+  let sql = `SELECT * FROM nodelogin.plan`
+  db.query(sql, (err, result) => {
+    if (err) {
+      throw err
+    } else {
+      console.log("Successfully retrieved plans")
+      res.send(result)
+    }
+  })
+}
+
+exports.createTask = (req, res) => {
+  const { name, description, notes, app, plan, creator, id } = req.body
+
+  const state = "open"
+
+  var today = new Date()
+  var date = today.getFullYear() + "-" + (today.getMonth() + 1) + "-" + today.getDate()
+  if (today.getMinutes() < 10) {
+    var time = today.getHours() + ":0" + today.getMinutes() + ":" + today.getSeconds()
+  } else {
+    var time = today.getHours() + ":" + today.getMinutes() + ":" + today.getSeconds()
+  }
+  var datetime = date + " " + time
+
+  let sql = "INSERT INTO nodelogin.task SET `Task_name` = ?, `Task_Description` = ?, `Task_notes` = ?, `Task_id` = ?, `Task_plan` = ?, `Task_app_Acronym` = ?, `Task_state` = ?, `Task_creator` = ?, `Task_owner` = ?, `Task_createDate` = ?"
+  db.query(sql, [name, description, notes, id, plan, app, state, creator, creator, datetime], (err, result) => {
+    if (err) {
+      throw err
+    } else {
+      console.log("Successfully created new task")
+      res.send(result)
+    }
+  })
+}

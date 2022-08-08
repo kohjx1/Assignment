@@ -11,10 +11,10 @@ const DropWrapper = ({ onDrop, children, status, group }) => {
 
       // finding column status index
       const itemIndex = statuses.findIndex(si => si.status === item.status)
-      console.log(itemIndex)
+      // console.log(itemIndex)
       // finding item's current status
       const statusIndex = statuses.findIndex(si => si.status === status)
-      console.log(statusIndex)
+      // console.log(statusIndex)
       // get from Open to-do-list (PM)
       if (group === "PM" && statusIndex === 1) {
         return [itemIndex + 1, itemIndex].includes(statusIndex)

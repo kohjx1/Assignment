@@ -2,7 +2,7 @@
 const { updateEmail, updatePassword, create, auth, findAll, findOne, adminUpdateUser, getUsers, emailPassUpdate } = require("../controllers/userController")
 const { checkGroup, getDistinctGroups, createGroup, viewGroup, groupInsertUsers, groupDeleteUsers, getOneUserGroupName } = require("../controllers/groupController")
 const { bulkUpdateEmail, bulkUpdatePassword, bulkUpdateStatus, bulkUpdateEmailPassword, bulkUpdatePasswordStatus, bulkUpdateEmailStatus, bulkUpdateEmailPasswordStatus } = require("../controllers/bulkEditController")
-const { createApp } = require("../controllers/applicationController")
+const { createTask, createApp, getPlans, getApps, getTaskID } = require("../controllers/applicationController")
 
 const { validateEmail, validateUsername, validatePassword, validateGroupname, validateApplicationName } = require("../validation/validation")
 
@@ -41,6 +41,10 @@ router.route("/bulkUpdateEmailStatus").post([validateEmail], bulkUpdateEmailStat
 router.route("/bulkUpdateEmailPasswordStatus").post([validateEmail, validatePassword], bulkUpdateEmailPasswordStatus)
 
 router.route("/createApp").post([validateApplicationName], createApp)
+router.route("/getPlans").get(getPlans)
+router.route("/getApps").get(getApps)
+router.route("/getTaskID").post(getTaskID)
+router.route("/createTask").post(createTask)
 
 // Pending
 

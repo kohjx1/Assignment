@@ -7,14 +7,19 @@ import { data, statuses } from "../../data/index"
 import { DndProvider } from "react-dnd"
 import { HTML5Backend } from "react-dnd-html5-backend"
 import { Modal, Box, TextField } from "@mui/material"
-import CreateWindow from "./CreateWindow"
+import CreateNewAppWindow from "./CreateNewAppWindow"
+import CreateNewTaskWindow from "./CreateNewTaskWindow"
 
 function Home() {
   const [items, setItems] = useState(data)
-  const [openApp, setOpenCreateApplication] = useState(false)
 
+  const [openApp, setOpenCreateApplication] = useState(false)
   const onOpenApp = () => setOpenCreateApplication(true)
   const onCloseApp = () => setOpenCreateApplication(false)
+
+  const [openTask, setOpenTask] = useState(false)
+  const onOpenTask = () => setOpenTask(true)
+  const onCloseTask = () => setOpenTask(false)
 
   const style = {
     position: "absolute",
@@ -80,10 +85,12 @@ function Home() {
               {s.status === "open" && group === "PL" ? (
                 <>
                   <button onClick={onOpenApp} className="button-create">
-                    Create New Application
+                    New Application
                   </button>
                   <br></br>
-                  <button className="button-create">Create Task</button>
+                  <button onClick={onOpenTask} className="button-create">
+                    New Task
+                  </button>
                 </>
               ) : s.status === "open" && group === "PM" ? (
                 <>
@@ -99,7 +106,8 @@ function Home() {
           )
         })}
       </div>
-      <CreateWindow open={openApp} onClose={onCloseApp} />
+      <CreateNewAppWindow open={openApp} onClose={onCloseApp} />
+      <CreateNewTaskWindow open={openTask} onClose={onCloseTask} />
     </DndProvider>
     // </>
   )
