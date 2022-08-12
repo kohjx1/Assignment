@@ -12,7 +12,7 @@ const Window = ({ show, onClose, item }) => {
     left: "50%",
     transform: "translate(-50%, -50%)",
     width: 700,
-    height: 700,
+    height: 750,
     bgcolor: "background.paper",
     backgroundColor: "#333",
     border: "2px solid #000",
@@ -25,21 +25,32 @@ const Window = ({ show, onClose, item }) => {
 
     <Modal keepMounted open={show} onClose={onClose} aria-labelledby="keep-mounted-modal-title" aria-describedby="keep-mounted-modal-description">
       <Box sx={style}>
-        <div className={"close-btn-ctn"}>
-          <h1 style={{ flex: "1 90%" }}>{item.title}</h1>
-          <button className={"close-btn"} onClick={onClose}>
-            X
-          </button>
+        <div className="item-font-color">
+          <div className={"close-btn-ctn"}>
+            <h1>
+              {item.Task_app_Acronym} - <strong style={{ color: "white" }}>{item.Task_name.toUpperCase()} ({item.Task_id})</strong>
+            </h1>
+            {/* <h1 style={{ flex: "1 90%" }}>{item.Task_name}</h1> */}
+            {/* <button className={"close-btn"} onClick={onClose}>
+              X
+            </button> */}
+          </div>
+          <h2>Description</h2>
+          {/* <div className={"prevent-overflow"}> */}
+          <div className="textarea-font-color">
+            <textarea defaultValue={item.Task_Description} cols="75" rows="8" readOnly />
+          </div>
+          <h2>Notes</h2>
+          {/* <div className={"prevent-overflow"}> */}
+          <div className="textarea-font-color">
+            <textarea defaultValue={item.Task_notes} cols="75" rows="8" readOnly />
+          </div>
+          <h2>State</h2>
+          <p>
+            {item.icon}
+            {`${item.Task_state.charAt(0).toUpperCase()}${item.Task_state.slice(1)}`}
+          </p>
         </div>
-        <h2>Description</h2>
-        <div className={"prevent-overflow"}>
-          <p>{item.content}</p>
-        </div>
-        <h2>Status</h2>
-        <p>
-          {item.icon}
-          {`${item.status.charAt(0).toUpperCase()}${item.status.slice(1)}`}
-        </p>
       </Box>
     </Modal>
   )

@@ -1,34 +1,34 @@
 const data = [
   {
-    id: 1,
+    id: "a",
     icon: "⭕️",
     status: "to-do-list",
     title: "Human Interest Form",
     content: "Fill out human interest distribution form"
   },
   {
-    id: 2,
+    id: "b",
     icon: "⭕️",
     status: "doing",
     title: "Purchase present",
     content: "Get an anniversary gift"
   },
   {
-    id: 3,
+    id: "c",
     icon: "⭕️",
     status: "done",
     title: "Invest in investments",
     content: "Call the bank to talk about investments Call the bank to talk about investmentsCall the bank to talk about investmentsCall the bank to talk about investmentsCall the bank to talk about investmentsCall the bank to talk about investmentsCall the bank to talk about investmentsCall the bank to talk about investmentsCall the bank to talk about investmentsCall the bank to talk about investmentsCall the bank to talk about investmentsCall the bank to talk about investmentsCall the bank to talk about investmentsCall the bank to talk about investmentsCall the bank to talk about investmentsCall the bank to talk about investmentsCall the bank to talk about investmentsCall the bank to talk about investmentsCall the bank to talk about investmentsCall the bank to talk about investmentsCall the bank to talk about investmentsCall the bank to talk about investmentsCall the bank to talk about investmentsCall the bank to talk about investmentsCall the bank to talk about investmentsCall the bank to talk about investmentsCall the bank to talk about investmentsCall the bank to talk about investmentsCall the bank to talk about investmentsCall the bank to talk about investmentsCall the bank to talk about investmentsCall the bank to talk about investmentsCall the bank to talk about investmentsCall the bank to talk about investmentsCall the bank to talk about investmentsCall the bank to talk about investmentsCall the bank to talk about investmentsCall the bank to talk about investmentsCall the bank to talk about investmentsCall the bank to talk about investmentsCall the bank to talk about investmentsCall the bank to talk about investmentsCall the bank to talk about investmentsCall the bank to talk about investmentsCall the bank to talk about investmentsCall the bank to talk about investmentsCall the bank to talk about investmentsCall the bank to talk about investmentsCall the bank to talk about investmentsCall the bank to talk about investmentsCall the bank to talk about investmentsCall the bank to talk about investmentsCall the bank to talk about investmentsCall the bank to talk about investmentsCall the bank to talk about investmentsCall the bank to talk about investmentsCall the bank to talk about investmentsCall the bank to talk about investmentsCall the bank to talk about investmentsCall the bank to talk about investmentsCall the bank to talk about investmentsCall the bank to talk about investmentsCall the bank to talk about investmentsCall the bank to talk about investmentsCall the bank to talk about investmentsCall the bank to talk about investmentsCall the bank to talk about investmentsCall the bank to talk about investmentsCall the bank to talk about investmentsCall the bank to talk about investmentsCall the bank to talk about investmentsCall the bank to talk about investmentsCall the bank to talk about investmentsCall the bank to talk about investmentsCall the bank to talk about investmentsCall the bank to talk about investmentsCall the bank to talk about investmentsCall the bank to talk about investmentsCall the bank to talk about investmentsCall the bank to talk about investmentsCall the bank to talk about investmentsCall the bank to talk about investmentsCall the bank to talk about investmentsCall the bank to talk about investmentsCall the bank to talk about investmentsCall the bank to talk about investmentsCall the bank to talk about investmentsCall the bank to talk about investmentsCall the bank to talk about investmentsCall the bank to talk about investmentsCall the bank to talk about investmentsCall the bank to talk about investmentsCall the bank to talk about investmentsCall the bank to talk about investmentsCall the bank to talk about investmentsCall the bank to talk about investmentsCall the bank to talk about investmentsCall the bank to talk about investments"
   },
   {
-    id: 4,
+    id: "d",
     icon: "⭕️",
     status: "closed",
     title: "Daily reading",
     content: "Finish reading Intro to UI/UX"
   },
   {
-    id: 4,
+    id: "e",
     icon: "⭕️",
     status: "open",
     title: " reading",
@@ -43,27 +43,27 @@ const statuses = [
   //   color: "#EB5A46"
   // },
   {
-    status: "open",
+    Task_state: "open",
     icon: "⭕️",
     color: "#EB5A46"
   },
   {
-    status: "to-do-list",
+    Task_state: "to-do-list",
     icon: "📋",
     color: "#00C2E0"
   },
   {
-    status: "doing",
+    Task_state: "doing",
     icon: "📝",
     color: "#C377E0"
   },
   {
-    status: "done",
+    Task_state: "done",
     icon: "✅",
     color: "#008000"
   },
   {
-    status: "closed",
+    Task_state: "closed",
     icon: "🎉",
     color: "#800000"
   }

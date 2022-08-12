@@ -64,6 +64,7 @@ function App() {
       sessionStorage.removeItem("token")
       sessionStorage.removeItem("username")
       sessionStorage.removeItem("role")
+      sessionStorage.removeItem("groups")
     }
   }, [state.loggedIn])
 

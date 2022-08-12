@@ -3,43 +3,80 @@ import { useDrop } from "react-dnd"
 import ITEM_TYPE from "../../data/types"
 import { statuses } from "../../data/index"
 
-const DropWrapper = ({ onDrop, children, status, group }) => {
+const DropWrapper = ({ onDrop, children, status, group, userPermission }) => {
   const [{ isOver }, drop] = useDrop({
     accept: ITEM_TYPE,
     canDrop: (item, monitor) => {
       // get the itemindex in status that matches the current item that is being dragged
+      // console.log(item)
+      // console.log(userPermission)
 
+      // check if item belongs to list of approved apps to move
+      // returns only specific app data in list with boolean values of each state column
+      const itemPermissions = userPermission.filter(e => {
+        return e.appName === item.Task_app_Acronym
+      })
+
+      // console.log(itemPermissions[0].App_permit_Create)
+      // console.log(itemPermissions[0])
       // finding column status index
-      const itemIndex = statuses.findIndex(si => si.status === item.status)
+      const itemIndex = statuses.findIndex(si => si.Task_state === item.Task_state)
       // console.log(itemIndex)
       // finding item's current status
-      const statusIndex = statuses.findIndex(si => si.status === status)
-      // console.log(statusIndex)
+      const statusIndex = statuses.findIndex(si => si.Task_state === status)
+      // console.log("status: ", statusIndex, "item: ", itemIndex)
+
       // get from Open to-do-list (PM)
-      if (group === "PM" && statusIndex === 1) {
+      // if (group === "PM" && statusIndex === 1 && itemIndex === 0) {
+      //   return [itemIndex + 1, itemIndex].includes(statusIndex)
+      // }
+
+      if (itemPermissions[0].App_permit_Open && statusIndex === 1 && itemIndex === 0) {
         return [itemIndex + 1, itemIndex].includes(statusIndex)
       }
+
       // get from to-do-list to doing (TM)
-      else if (group === "TM" && statusIndex === 2) {
+      // else if (group === "TM" && (statusIndex === 2) & (itemIndex === 1)) {
+      //   return [itemIndex + 1, itemIndex].includes(statusIndex)
+      // }
+      else if (itemPermissions[0].App_permit_toDoList && statusIndex === 2 && itemIndex === 1) {
         return [itemIndex + 1, itemIndex].includes(statusIndex)
       }
+
       // get from doing to to-do-list (TM)
-      else if (group === "TM" && statusIndex === 1) {
+      // else if (group === "TM" && statusIndex === 1 && itemIndex === 2) {
+      //   return [itemIndex - 1, itemIndex].includes(statusIndex)
+      // }
+      else if (itemPermissions[0].App_permit_Doing && statusIndex === 1 && itemIndex === 2) {
         return [itemIndex - 1, itemIndex].includes(statusIndex)
       }
+
       // get from doing to done (TM)
-      else if (group === "TM" && statusIndex === 3) {
+      // else if (group === "TM" && statusIndex === 3 && itemIndex === 2) {
+      //   return [itemIndex + 1, itemIndex].includes(statusIndex)
+      // }
+      else if (itemPermissions[0].App_permit_Doing && statusIndex === 3 && itemIndex === 2) {
         return [itemIndex + 1, itemIndex].includes(statusIndex)
       }
+
       // get from done to doing (PL)
-      else if (group === "PL" && statusIndex === 2) {
+      // else if (group === "PL" && statusIndex === 2 && itemIndex === 3) {
+      //   return [itemIndex - 1, itemIndex].includes(statusIndex)
+      // }
+
+      // get from done to doing (PL)
+      else if (itemPermissions[0].App_permit_Done && statusIndex === 2 && itemIndex === 3) {
         return [itemIndex - 1, itemIndex].includes(statusIndex)
       }
+
       // get from done to close (PL)
-      else if (group === "PL" && statusIndex === 4) {
+      // else if (group === "PL" && statusIndex === 4 && itemIndex === 3) {
+      //   return [itemIndex + 1, itemIndex].includes(statusIndex)
+      // }
+      else if (itemPermissions[0].App_permit_Done && statusIndex === 4 && itemIndex === 3) {
         return [itemIndex + 1, itemIndex].includes(statusIndex)
       } else {
-        return
+        return [itemIndex].includes(statusIndex)
       }
 
       // if to the left or right or at current column, then can drop the draggable item

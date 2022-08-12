@@ -3,7 +3,7 @@ import React, { useState, useEffect } from "react"
 import { Collapse, Alert, Button, Select, OutlinedInput, ListItemText, Checkbox, InputLabel, MenuItem, FormControl, Grid, Modal, Box, TextField } from "@mui/material"
 import Axios from "axios"
 
-const CreateNewTaskWindow = ({ open, onClose }) => {
+const CreateNewTaskWindow = ({ open, onClose, userPermission }) => {
   const [name, setName] = useState("")
   const [description, setDescription] = useState("")
   const [notes, setNotes] = useState("")
@@ -14,6 +14,10 @@ const CreateNewTaskWindow = ({ open, onClose }) => {
   const [plans, setPlans] = useState([])
   const [apps, setApps] = useState([])
 
+  const [success, setSuccess] = useState(false)
+  // const [fail, setFail] = useState(false)
+  // const [errors, setErrors] = useState("")
+
   const resetValues = () => {
     setName("")
     setDescription("")
@@ -21,6 +25,9 @@ const CreateNewTaskWindow = ({ open, onClose }) => {
     setSelectedPlans("")
     setApp("")
   }
+
+  console.log(userPermission.filter(e => e.App_permit_Create === true))
+  console.log(apps)
 
   const ITEM_HEIGHT = 48
   const ITEM_PADDING_TOP = 8
@@ -63,13 +70,22 @@ const CreateNewTaskWindow = ({ open, onClose }) => {
 
   async function getApps(e) {
     try {
-      const response = await Axios.get("http://localhost:8080/getApps")
+      // const response = await Axios.get("http://localhost:8080/getApps")
+
+      let filtered = userPermission.filter(e => e.App_permit_Create === true)
       let tmp = []
-      for (var i = 0; i < response.data.length; i++) {
-        tmp.push(response.data[i].App_Acronym)
+
+      for (var i = 0; i < filtered.length; i++) {
+        tmp.push(filtered[i].appName)
       }
-      console.log(tmp)
       setApps(tmp)
+
+      // let tmp = []
+      // for (var i = 0; i < response.data.length; i++) {
+      //   tmp.push(response.data[i].App_Acronym)
+      // }
+      // console.log(tmp)
+      // setApps(tmp)
     } catch (e) {
       console.log("There was a problem")
       return
@@ -79,15 +95,55 @@ const CreateNewTaskWindow = ({ open, onClose }) => {
   useEffect(() => {
     getPlans()
     getApps()
-  }, [])
+  }, [open])
+
+  useEffect(() => {
+    const timeout = setTimeout(() => {
+      setSuccess(false)
+    }, 1000)
+
+    return () => clearTimeout(timeout)
+  }, [success])
+
+  // useEffect(() => {
+  //   const timeout = setTimeout(() => {
+  //     setFail(false)
+  //     setErrors(false)
+  //   }, 1000)
+  //   return () => clearTimeout(timeout)
+  // }, [fail])
+
+  // const getError = (errors, prop) => {
+  //   try {
+  //     return errors.filter(e => e.param === prop)[0].msg
+  //   } catch (error) {
+  //     return ""
+  //   }
+  // }
 
   async function addTask(e) {
+    const noapp = await Axios.post("http://localhost:8080/countTaskPerApp", { appname: app })
+
     const response = await Axios.post("http://localhost:8080/getTaskID", { name: app })
-    var id = response.data[0].App_Acronym + "_" + response.data[0].App_Rnumber
+
+    var num = noapp.data[0].size + response.data[0].App_Rnumber
+    var id = response.data[0].App_Acronym + "_" + num
     console.log(id)
     if (response) {
       try {
-        const response = await Axios.post("http://localhost:8080/createTask", { name: name, description: description, notes: notes, app: app, plan: selectedPlans, creator: sessionStorage.getItem("username"), id: id })
+        const response = await Axios.post("http://localhost:8080/createTask", { app: app, name: name, description: description, notes: notes, plan: selectedPlans, creator: sessionStorage.getItem("username"), id: id })
+
+        // const err = response.data.errors
+        // console.log(err)
+        // if (err) {
+        //   setErrors(getError(err, "taskname"))
+        //   setFail(true)
+        // } else {
+
+        // }
+
+        setSuccess(true)
+        window.location.reload()
         resetValues()
       } catch (e) {
         console.log("There was a problem")
@@ -106,6 +162,9 @@ const CreateNewTaskWindow = ({ open, onClose }) => {
   return (
     <Modal keepMounted open={open} onClose={onClose} aria-labelledby="keep-mounted-modal-title" aria-describedby="keep-mounted-modal-description">
       <Box sx={style}>
+        <Collapse in={success} className="parent">
+          <Alert severity="success">Created New User Successfully</Alert>
+        </Collapse>
         <Grid container direction={"column"} spacing={2}>
           <Grid item>
             <h2 className="newTask">New Task</h2>
@@ -128,31 +187,30 @@ const CreateNewTaskWindow = ({ open, onClose }) => {
           </Grid>
 
           <Grid item>
-            <TextField
-              variant="filled"
-              sx={{ bgcolor: "white", fontWeight: "fontWeightLight", borderRadius: 2 }}
+            <textarea
+              className="textarea"
+              // style={{ resize: "none" }}
               value={description}
-              label="Description"
               placeholder="Enter Description"
-              fullWidth
-              required
+              // cols="75"
+
+              rows="2"
               onChange={e => {
                 setDescription(e.target.value)
               }}
+              defaultValue=""
               // error={fail ? true : false}
               // helperText={errors}
             />
           </Grid>
 
           <Grid item>
-            <TextField
-              variant="filled"
-              sx={{ bgcolor: "white", fontWeight: "fontWeightLight", borderRadius: 2 }}
+            <textarea
+              className="textarea"
               value={notes}
-              label="Notes"
               placeholder="Enter Notes"
-              fullWidth
-              required
+              // cols="60"
+              rows="5"
               onChange={e => {
                 setNotes(e.target.value)
               }}

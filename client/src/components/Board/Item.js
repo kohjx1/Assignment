@@ -69,7 +69,8 @@ const Item = ({ item, index, moveItem, status }) => {
     <Fragment>
       <div ref={ref} style={{ opacity: isDragging ? 0 : 1 }} className={"item"} onClick={onOpen}>
         <div className={"color-bar"} style={{ backgroundColor: status.color }} />
-        <p className={"item-title"}>{item.content}</p>
+        <p className={"item-app"}>{item.Task_app_Acronym}</p>
+        <p className={"item-title"}>{item.Task_name}</p>
         <p className={"item-status"}>{item.icon}</p>
       </div>
       <Window item={item} onClose={onClose} show={show} />

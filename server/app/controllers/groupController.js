@@ -12,7 +12,7 @@ const salt = 10
 exports.checkGroup = (req, res) => {
   // Init values from the front end
   const { username, groupname } = req.body
-  console.log(req.body)
+  console.log(username, groupname)
   let sql = `SELECT IF(  EXISTS(SELECT * FROM nodelogin.groups  WHERE LOWER(username) = ? and LOWER(groupname) = ? ),'true','false' )AS result`
   db.query(sql, [username, groupname], (err, result) => {
     if (err) {
