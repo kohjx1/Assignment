@@ -38,16 +38,22 @@ exports.getApps = (req, res) => {
 }
 
 exports.getTaskID = (req, res) => {
-  const { name } = req.body
-  let sql = "SELECT `App_Acronym`, `App_Rnumber` FROM nodelogin.application WHERE `App_Acronym` = ?"
-  db.query(sql, [name], (err, result) => {
-    if (err) {
-      throw err
-    } else {
-      console.log("Retrieved taskID Successfully")
-      res.send(result)
-    }
-  })
+  const errors = validationResult(req)
+  if (!errors.isEmpty()) {
+    console.log(errors)
+    return res.send(errors)
+  } else {
+    const { name } = req.body
+    let sql = "SELECT `App_Acronym`, `App_Rnumber` FROM nodelogin.application WHERE `App_Acronym` = ?"
+    db.query(sql, [name], (err, result) => {
+      if (err) {
+        throw err
+      } else {
+        console.log("Retrieved taskID Successfully")
+        res.send(result)
+      }
+    })
+  }
 }
 
 exports.getPlans = (req, res) => {
@@ -76,15 +82,21 @@ exports.createTask = (req, res) => {
   }
   var datetime = date + " " + time
 
-  let sql = "INSERT INTO nodelogin.task SET `Task_name` = ?, `Task_Description` = ?, `Task_notes` = ?, `Task_id` = ?, `Task_plan` = ?, `Task_app_Acronym` = ?, `Task_state` = ?, `Task_creator` = ?, `Task_owner` = ?, `Task_createDate` = ?"
-  db.query(sql, [name, description, notes, id, plan, app, state, creator, creator, datetime], (err, result) => {
-    if (err) {
-      throw err
-    } else {
-      console.log("Successfully created new task")
-      res.send(result)
-    }
-  })
+  const errors = validationResult(req)
+  if (!errors.isEmpty()) {
+    console.log(errors)
+    return res.send(errors)
+  } else {
+    let sql = "INSERT INTO nodelogin.task SET `Task_name` = ?, `Task_Description` = ?, `Task_notes` = ?, `Task_id` = ?, `Task_plan` = ?, `Task_app_Acronym` = ?, `Task_state` = ?, `Task_creator` = ?, `Task_owner` = ?, `Task_createDate` = ?"
+    db.query(sql, [name, description, notes, id, plan, app, state, creator, creator, datetime], (err, result) => {
+      if (err) {
+        throw err
+      } else {
+        console.log("Successfully created new task")
+        res.send(result)
+      }
+    })
+  }
 }
 
 exports.getTasks = (req, res) => {
@@ -148,18 +160,6 @@ exports.updateApplication = (req, res) => {
     } else {
       console.log("Successfully edited application data")
       res.send(result)
-    }
-  })
-}
-
-exports.checkIfPlanNameExists = (req, res) => {
-  const { planname, appname } = req.body
-  let sql = "SELECT COUNT(*) AS total FROM nodelogin.plan WHERE LOWER(Plan_MVP_name) = ? AND LOWER(Plan_app_Acronym) = ?"
-  db.query(sql, [planname, appname], (err, result) => {
-    if (!err) {
-      res.send(result[0].total > 0)
-    } else {
-      res.send("Can't query lol")
     }
   })
 }

@@ -35,9 +35,9 @@ function CreateNewPlanWindow({ open, onClose, userPermission }) {
 
   const [appSelected, setAppSelected] = useState("")
 
-  const [errors, setErrors] = useState("")
   const [success, setSuccess] = useState(false)
-  const [fail, setFail] = useState(false)
+
+  const [errors, setErrors] = useState("")
 
   const resetValues = () => {
     setPlanName("")
@@ -62,8 +62,7 @@ function CreateNewPlanWindow({ open, onClose, userPermission }) {
       const err = response.data.errors
 
       if (err) {
-        setErrors(getError(err, "planname"))
-        setFail(true)
+        setErrors(err)
       } else {
         setSuccess(true)
         resetValues()
@@ -95,12 +94,15 @@ function CreateNewPlanWindow({ open, onClose, userPermission }) {
   }, [])
 
   useEffect(() => {
+    resetValues()
+  }, [onClose])
+
+  useEffect(() => {
     const timeout = setTimeout(() => {
-      setFail(false)
-      setErrors(false)
+      setErrors("")
     }, 1000)
     return () => clearTimeout(timeout)
-  }, [fail])
+  }, [getError])
 
   useEffect(() => {
     const timeout = setTimeout(() => {
@@ -110,7 +112,7 @@ function CreateNewPlanWindow({ open, onClose, userPermission }) {
     return () => clearTimeout(timeout)
   }, [success])
 
-  // console.log(appSelected)
+  console.log(appSelected)
 
   return (
     <Modal keepMounted open={open} onClose={onClose} aria-labelledby="keep-mounted-modal-title" aria-describedby="keep-mounted-modal-description">
@@ -134,42 +136,8 @@ function CreateNewPlanWindow({ open, onClose, userPermission }) {
               onChange={e => {
                 setPlanName(e.target.value)
               }}
-              error={fail ? true : false}
-              helperText={errors}
-            />
-          </Grid>
-          {/* date start cannot be less than app date start and not more than app date end */}
-          <Grid item>
-            <TextField
-              InputProps={{ sx: { height: 100 } }}
-              variant="filled"
-              sx={{ bgcolor: "white", fontWeight: "fontWeightLight", borderRadius: 2 }}
-              value={startDate}
-              label="Set Start Date"
-              placeholder="Enter Start Date"
-              fullWidth
-              required
-              onChange={e => {
-                setStartDate(e.target.value)
-              }}
-              type="date"
-            />
-          </Grid>
-          {/* date end cannot be less than date start, cannot be more than app date end */}
-          <Grid item>
-            <TextField
-              InputProps={{ sx: { height: 100 } }}
-              variant="filled"
-              sx={{ bgcolor: "white", fontWeight: "fontWeightLight", borderRadius: 2 }}
-              value={endDate}
-              label="Set End Date"
-              placeholder="Enter End Date"
-              fullWidth
-              required
-              onChange={e => {
-                setEndDate(e.target.value)
-              }}
-              type="date"
+              error={getError(errors, "planname") ? true : false}
+              helperText={getError(errors, "planname")}
             />
           </Grid>
           <Grid item>
@@ -187,6 +155,48 @@ function CreateNewPlanWindow({ open, onClose, userPermission }) {
               </Select>
             </FormControl>
           </Grid>
+          {/* date start cannot be less than app date start and not more than app date end */}
+          {
+            <Grid item>
+              <TextField
+                disabled={appSelected ? false : true}
+                InputProps={{ sx: { height: 100 } }}
+                variant="filled"
+                sx={{ bgcolor: "white", fontWeight: "fontWeightLight", borderRadius: 2 }}
+                value={startDate}
+                label="Set Start Date"
+                placeholder="Enter Start Date"
+                fullWidth
+                required
+                onChange={e => {
+                  setStartDate(e.target.value)
+                }}
+                type="date"
+                error={getError(errors, "startdate") ? true : false}
+                helperText={getError(errors, "startdate")}
+              />
+            </Grid>
+            /* date end cannot be less than date start, cannot be more than app date end */
+          }
+          <Grid item>
+            <TextField
+              disabled={appSelected ? false : true}
+              InputProps={{ sx: { height: 100 } }}
+              variant="filled"
+              sx={{ bgcolor: "white", fontWeight: "fontWeightLight", borderRadius: 2 }}
+              value={endDate}
+              label="Set End Date"
+              placeholder="Enter End Date"
+              fullWidth
+              required
+              onChange={e => {
+                setEndDate(e.target.value)
+              }}
+              type="date"
+              error={getError(errors, "enddate") ? true : false}
+              helperText={getError(errors, "enddate")}
+            />
+          </Grid>{" "}
           <Grid item>
             <Button type="submit" color="primary" variant="contained" fullWidth onClick={createPlan}>
               Create Plan

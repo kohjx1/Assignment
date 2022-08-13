@@ -1,4 +1,4 @@
-const { check } = require("express-validator")
+const { check, body } = require("express-validator")
 const db = require("../models/dbcon")
 
 // function used to validate if username exists in database
@@ -80,19 +80,19 @@ function planEndDate(appname, enddate, startdate) {
   })
 }
 
-// function isTaskNameInUse({ app, name }) {
-//   console.log(app, name)
-//   return new Promise((resolve, reject) => {
-//     let sql = `SELECT COUNT(*) AS total FROM nodelogin.task WHERE LOWER(Task_app_Acronym) = ? AND LOWER(Task_name) = ? `
-//     db.query(sql, [app, name], (err, result) => {
-//       if (!err) {
-//         return resolve(result[0].total > 0)
-//       } else {
-//         return reject(new Error("Database Error"))
-//       }
-//     })
-//   })
-// }
+function isTaskNameInUse(app, taskname) {
+  console.log(app, taskname)
+  return new Promise((resolve, reject) => {
+    let sql = `SELECT COUNT(*) AS total FROM nodelogin.task WHERE LOWER(Task_app_Acronym) = ? AND LOWER(Task_name) = ? `
+    db.query(sql, [app, taskname], (err, result) => {
+      if (!err) {
+        return resolve(result[0].total > 0)
+      } else {
+        return reject(new Error("Database Error"))
+      }
+    })
+  })
+}
 
 module.exports = {
   validateEmail: check("email").trim().notEmpty().withMessage("You have to enter an Email Address").isEmail().withMessage("Invalid Email Address"),
@@ -198,14 +198,24 @@ module.exports = {
         throw new Error("End date cannot be earlier than app start date or later than app end date")
       }
     })
-    .withMessage("End date cannot be earlier than app start date or later than app end date")
+    .withMessage("End date cannot be earlier than app start date or later than app end date"),
 
-  // validateTaskName: check("taskname")
-  //   .custom(async (app, name) => {
-  //     const value = await isTaskNameInUse(app, name)
-  //     if (value) {
-  //       throw new Error("Task name is already in use in this application")
-  //     }
-  //   })
-  //   .withMessage("Task name is already in use in this application")
+  validateTaskName: check(["name", "app"])
+    .trim()
+    .notEmpty()
+    .withMessage("Please key in a unique task name")
+    .custom(async (e, appSelected) => {
+      // const { appname, startdate } = req.body
+      console.log(appSelected.req.body)
+      const app = appSelected.req.body.app
+      const taskname = appSelected.req.body.name
+      console.log("appname: ", app)
+      console.log("taskname", taskname)
+      const value = await isTaskNameInUse(app, taskname)
+      console.log(value)
+      if (value) {
+        throw new Error("You have to enter a unique task name for each application")
+      }
+    })
+    .withMessage("You have to enter a unique task name for each application")
 }

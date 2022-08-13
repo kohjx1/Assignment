@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from "react"
 // import Modal from "react-modal"
-import { Collapse, Alert, Button, Select, OutlinedInput, ListItemText, Checkbox, InputLabel, MenuItem, FormControl, Grid, Modal, Box, TextField } from "@mui/material"
+import { FormHelperText, Collapse, Alert, Button, Select, OutlinedInput, ListItemText, Checkbox, InputLabel, MenuItem, FormControl, Grid, Modal, Box, TextField } from "@mui/material"
 import Axios from "axios"
 
 const CreateNewTaskWindow = ({ open, onClose, userPermission }) => {
@@ -15,8 +15,9 @@ const CreateNewTaskWindow = ({ open, onClose, userPermission }) => {
   const [apps, setApps] = useState([])
 
   const [success, setSuccess] = useState(false)
-  // const [fail, setFail] = useState(false)
-  // const [errors, setErrors] = useState("")
+
+  const [errors, setErrors] = useState("")
+  const [errorApp, setErrorApp] = useState("")
 
   const resetValues = () => {
     setName("")
@@ -27,7 +28,7 @@ const CreateNewTaskWindow = ({ open, onClose, userPermission }) => {
   }
 
   console.log(userPermission.filter(e => e.App_permit_Create === true))
-  console.log(apps)
+  // console.log(apps)
 
   const ITEM_HEIGHT = 48
   const ITEM_PADDING_TOP = 8
@@ -54,13 +55,19 @@ const CreateNewTaskWindow = ({ open, onClose, userPermission }) => {
     p: 4
   }
 
+  console.log(app)
   async function getPlans(e) {
     try {
       const response = await Axios.get("http://localhost:8080/getPlans")
+
+      let plans = response.data
+      let plansArr = plans.filter(e => e.Plan_app_Acronym === app)
+      console.log(plansArr)
       let tmp = []
-      for (var i = 0; i < response.data.length; i++) {
-        tmp.push(response.data[i].Plan_MVP_name)
+      for (var i = 0; i < plansArr.length; i++) {
+        tmp.push(plansArr[i].Plan_MVP_name)
       }
+      console.log(tmp)
       setPlans(tmp)
     } catch (e) {
       console.log("There was a problem")
@@ -105,49 +112,52 @@ const CreateNewTaskWindow = ({ open, onClose, userPermission }) => {
     return () => clearTimeout(timeout)
   }, [success])
 
-  // useEffect(() => {
-  //   const timeout = setTimeout(() => {
-  //     setFail(false)
-  //     setErrors(false)
-  //   }, 1000)
-  //   return () => clearTimeout(timeout)
-  // }, [fail])
+  const getError = (errors, prop) => {
+    try {
+      return errors.filter(e => e.param === prop)[0].msg
+    } catch (error) {
+      return ""
+    }
+  }
 
-  // const getError = (errors, prop) => {
-  //   try {
-  //     return errors.filter(e => e.param === prop)[0].msg
-  //   } catch (error) {
-  //     return ""
-  //   }
-  // }
+  useEffect(() => {
+    const timeout = setTimeout(() => {
+      setErrors("")
+    }, 1000)
+    return () => clearTimeout(timeout)
+  }, [getError])
+
+  useEffect(() => {
+    const timeout = setTimeout(() => {
+      setErrorApp("")
+    }, 1000)
+    return () => clearTimeout(timeout)
+  }, [errorApp])
 
   async function addTask(e) {
-    const noapp = await Axios.post("http://localhost:8080/countTaskPerApp", { appname: app })
+    if (!app) {
+      setErrorApp("You need to select an application name to tag your task to")
+    } else {
+      const noapp = await Axios.post("http://localhost:8080/countTaskPerApp", { appname: app })
 
-    const response = await Axios.post("http://localhost:8080/getTaskID", { name: app })
+      const response = await Axios.post("http://localhost:8080/getTaskID", { name: app })
 
-    var num = noapp.data[0].size + response.data[0].App_Rnumber
-    var id = response.data[0].App_Acronym + "_" + num
-    console.log(id)
-    if (response) {
+      var num = noapp.data[0].size + response.data[0].App_Rnumber
+      var id = response.data[0].App_Acronym + "_" + num
+      console.log(id)
       try {
-        const response = await Axios.post("http://localhost:8080/createTask", { app: app, name: name, description: description, notes: notes, plan: selectedPlans, creator: sessionStorage.getItem("username"), id: id })
-
-        // const err = response.data.errors
-        // console.log(err)
-        // if (err) {
-        //   setErrors(getError(err, "taskname"))
-        //   setFail(true)
-        // } else {
-
-        // }
-
-        setSuccess(true)
-        window.location.reload()
-        resetValues()
+        const responseCreate = await Axios.post("http://localhost:8080/createTask", { app: app, name: name, description: description, notes: notes, plan: selectedPlans, creator: sessionStorage.getItem("username"), id: id })
+        const err = responseCreate.data.errors
+        if (err) {
+          console.log(err)
+          setErrors(err)
+        } else {
+          setSuccess(true)
+          window.location.reload()
+          resetValues()
+        }
       } catch (e) {
-        console.log("There was a problem")
-        return
+        console.log(e)
       }
     }
   }
@@ -156,8 +166,19 @@ const CreateNewTaskWindow = ({ open, onClose, userPermission }) => {
     return item.map(e => <MenuItem value={e}>{e}</MenuItem>)
   }
 
+  useEffect(() => {
+    resetValues()
+  }, [onClose])
   console.log(selectedPlans)
   console.log(app)
+
+  const handleChange = e => {
+    setApp(e.target.value)
+  }
+
+  useEffect(() => {
+    getPlans()
+  }, [app])
 
   return (
     <Modal keepMounted open={open} onClose={onClose} aria-labelledby="keep-mounted-modal-title" aria-describedby="keep-mounted-modal-description">
@@ -168,6 +189,22 @@ const CreateNewTaskWindow = ({ open, onClose, userPermission }) => {
         <Grid container direction={"column"} spacing={2}>
           <Grid item>
             <h2 className="newTask">New Task</h2>
+          </Grid>
+
+          <Grid item>
+            <FormControl fullWidth variant="filled" sx={{ bgcolor: "white", fontWeight: "fontWeightLight", borderRadius: 2 }}>
+              <InputLabel id="demo-simple-select-filled-label">Application</InputLabel>
+              <Select
+                labelId="demo-simple-select-filled-label"
+                id="demo-simple-select-filled"
+                value={app}
+                onChange={handleChange}
+                // error={getError(errors, "isappnameselected") ? true : false}
+              >
+                {renderList(apps)}
+              </Select>
+              <FormHelperText sx={{ color: "red" }}>{errorApp}</FormHelperText>
+            </FormControl>
           </Grid>
           <Grid item>
             <TextField
@@ -181,8 +218,8 @@ const CreateNewTaskWindow = ({ open, onClose, userPermission }) => {
               onChange={e => {
                 setName(e.target.value)
               }}
-              // error={fail ? true : false}
-              // helperText={errors}
+              error={getError(errors, "name") || getError(errors, "app") ? true : false}
+              helperText={getError(errors, "name") || getError(errors, "app")}
             />
           </Grid>
 
@@ -236,22 +273,6 @@ const CreateNewTaskWindow = ({ open, onClose, userPermission }) => {
           </Grid>
 
           <Grid item>
-            <FormControl fullWidth variant="filled" sx={{ bgcolor: "white", fontWeight: "fontWeightLight", borderRadius: 2 }}>
-              <InputLabel id="demo-simple-select-filled-label">Application</InputLabel>
-              <Select
-                labelId="demo-simple-select-filled-label"
-                id="demo-simple-select-filled"
-                value={app}
-                onChange={e => {
-                  setApp(e.target.value)
-                }}
-              >
-                {renderList(apps)}
-              </Select>
-            </FormControl>
-          </Grid>
-
-          <Grid item>
             <Button onClick={addTask} type="submit" color="primary" variant="contained" fullWidth>
               Create
             </Button>
@@ -263,70 +284,3 @@ const CreateNewTaskWindow = ({ open, onClose, userPermission }) => {
 }
 
 export default CreateNewTaskWindow
-
-// multi select
-{
-  /* <Grid item>
-            <FormControl fullWidth variant="filled" sx={{ bgcolor: "white", fontWeight: "fontWeightLight", borderRadius: 2 }}>
-              <InputLabel id="demo-multiple-checkbox-label">Plan</InputLabel>
-              <Select
-                labelId="demo-multiple-checkbox-label"
-                id="demo-multiple-checkbox"
-                multiple
-                value={selectedPlans}
-                onChange={event => {
-                  const {
-                    target: { value }
-                  } = event
-                  setSelectedPlans(
-                    // On autofill we get a stringified value.
-                    typeof value === "string" ? value.split(",") : value
-                  )
-                }}
-                input={<OutlinedInput label="Tag" />}
-                renderValue={selected => selected.join(", ")}
-                MenuProps={MenuProps}
-              >
-                {plans.map(name => (
-                  <MenuItem key={name} value={name}>
-                    <Checkbox checked={selectedPlans.indexOf(name) > -1} />
-                    <ListItemText primary={name} />
-                  </MenuItem>
-                ))}
-              </Select>
-            </FormControl>
-          </Grid> */
-}
-
-{
-  /* <Grid item>
-            <FormControl fullWidth variant="filled" sx={{ bgcolor: "white", fontWeight: "fontWeightLight", borderRadius: 2 }}>
-              <InputLabel id="demo-multiple-checkbox-label">Application</InputLabel>
-              <Select
-                labelId="demo-multiple-checkbox-label"
-                id="demo-multiple-checkbox"
-                multiple
-                value={app}
-                onChange={event => {
-                  const {
-                    target: { value }
-                  } = event
-                  setApp(
-                    // On autofill we get a stringified value.
-                    typeof value === "string" ? value.split(",") : value
-                  )
-                }}
-                input={<OutlinedInput label="Tag" />}
-                renderValue={selected => selected.join(", ")}
-                MenuProps={MenuProps}
-              >
-                {apps.map(name => (
-                  <MenuItem key={name} value={name}>
-                    <Checkbox checked={app.indexOf(name) > -1} />
-                    <ListItemText primary={name} />
-                  </MenuItem>
-                ))}
-              </Select>
-            </FormControl>
-          </Grid> */
-}

@@ -2,9 +2,9 @@
 const { updateEmail, updatePassword, create, auth, findAll, findOne, adminUpdateUser, getUsers, emailPassUpdate } = require("../controllers/userController")
 const { checkGroup, getDistinctGroups, createGroup, viewGroup, groupInsertUsers, groupDeleteUsers, getOneUserGroupName } = require("../controllers/groupController")
 const { bulkUpdateEmail, bulkUpdatePassword, bulkUpdateStatus, bulkUpdateEmailPassword, bulkUpdatePasswordStatus, bulkUpdateEmailStatus, bulkUpdateEmailPasswordStatus } = require("../controllers/bulkEditController")
-const { createPlan, checkIfPlanNameExists, updateApplication, getSpecificAppDetails, updateStatus, countTaskPerApp, getTasks, createTask, createApp, getPlans, getApps, getTaskID } = require("../controllers/applicationController")
+const { createPlan, updateApplication, getSpecificAppDetails, updateStatus, countTaskPerApp, getTasks, createTask, createApp, getPlans, getApps, getTaskID } = require("../controllers/applicationController")
 
-const { validateEndDate, validateStartDate, validatePlanName, validateEmail, validateUsername, validatePassword, validateGroupname, validateApplicationName } = require("../validation/validation")
+const { validateTaskName, validateEndDate, validateStartDate, validatePlanName, validateEmail, validateUsername, validatePassword, validateGroupname, validateApplicationName } = require("../validation/validation")
 
 const express = require("express")
 const router = express.Router()
@@ -44,7 +44,7 @@ router.route("/createApp").post([validateApplicationName], createApp)
 router.route("/getPlans").get(getPlans)
 router.route("/getApps").get(getApps)
 router.route("/getTaskID").post(getTaskID)
-router.route("/createTask").post(createTask)
+router.route("/createTask").post([validateTaskName], createTask)
 router.route("/getTasks").get(getTasks)
 router.route("/countTaskPerApp").post(countTaskPerApp)
 router.route("/updateStatus").post(updateStatus)
@@ -54,7 +54,6 @@ router.route("/getSpecificAppDetails").post(getSpecificAppDetails)
 router.route("/updateApplication").post(updateApplication)
 
 // check if plan name already exist for current app selected
-router.route("/checkIfPlanNameExists").post(checkIfPlanNameExists)
 router.route("/createPlan").post([validatePlanName, validateStartDate, validateEndDate], createPlan)
 // Pending
 
