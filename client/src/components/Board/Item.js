@@ -1,9 +1,10 @@
-import React, { Fragment, useState, useRef } from "react"
+import React, { Fragment, useState, useRef, useEffect } from "react"
 import { useDrag, useDrop } from "react-dnd"
 import Window from "./Window"
 import ITEM_TYPE from "../../data/types"
+import Axios from "axios"
 
-const Item = ({ item, index, moveItem, status }) => {
+const Item = ({ item, index, moveItem, status, userPermission, items, setItems }) => {
   const ref = useRef(null)
 
   const [, drop] = useDrop({
@@ -65,15 +66,37 @@ const Item = ({ item, index, moveItem, status }) => {
   // so that item can be dropped and also dragged
   drag(drop(ref))
 
+  // console.log(plans)
+  // console.log(item)
+  // console.log(planname)
+  // const planFiltered = plans.filter(i => i.Plan_MVP_name === item.Task_plan)
+  // console.log(planFiltered)
+  // // const planFiltered = plans.filter(i => i.Plan_MVP_name === item.Task_plan)
+  // // console.log(planFiltered)
+  // const startdate = planFiltered.Plan_startDate
+  // const enddate = planFiltered.Plan_endDate
+  // console.log(startdate)
+  // console.log(enddate)
+
+  // function getDates(planname) {
+  //   const planFiltered = plans.filter(i => i.Plan_MVP_name === planname)[0]
+  //   let startDate = planFiltered
+  //   console.log(startDate)
+  //   return startDate
+  // }
+
+  // console.log(userPermission.filter(e => e.appName === item.Task_app_Acronym)[0].App_permit_toDoList)
+
   return (
     <Fragment>
       <div ref={ref} style={{ opacity: isDragging ? 0 : 1 }} className={"item"} onClick={onOpen}>
         <div className={"color-bar"} style={{ backgroundColor: status.color }} />
-        <p className={"item-app"}>{item.Task_app_Acronym}</p>
+        <p className={"item-app"}>{item.Task_plan ? item.Task_app_Acronym + ` (${item.Task_plan.toUpperCase()})` : item.Task_app_Acronym}</p>
         <p className={"item-title"}>{item.Task_name}</p>
+
         <p className={"item-status"}>{item.icon}</p>
       </div>
-      <Window item={item} onClose={onClose} show={show} />
+      {show ? <Window item={item} onClose={onClose} show={show} userPermission={userPermission} items={items} setItems={setItems} /> : ""}
     </Fragment>
   )
 }

@@ -11,6 +11,7 @@ import CreateNewAppWindow from "./CreateNewAppWindow"
 import CreateNewTaskWindow from "./CreateNewTaskWindow"
 import EditAppWindow from "./EditAppWindow"
 import CreateNewPlanWindow from "./CreateNewPlanWindow"
+import AssignPlanWindow from "./AssignPlanWindow"
 import Axios from "axios"
 import StateContext from "../../StateContext"
 
@@ -33,6 +34,7 @@ function Home() {
       // console.log(tmp)
       setItems(tmp)
       getApplications()
+      getPlans()
     } catch (e) {
       console.log(e)
       return
@@ -41,6 +43,8 @@ function Home() {
 
   // const [items, setItems] = useState(data)
   const [items, setItems] = useState([])
+  const [plans, setPlans] = useState([])
+
   // console.log(items)
   const [openApp, setOpenCreateApplication] = useState(false)
   const onOpenApp = () => setOpenCreateApplication(true)
@@ -58,12 +62,14 @@ function Home() {
   const onOpenCreatePlan = () => setOpenCreatePlan(true)
   const onCloseCreatePlan = () => setOpenCreatePlan(false)
 
+  const [openAssignPlan, setOpenAssignPlan] = useState(false)
+  const onOpenAssignPlan = () => setOpenAssignPlan(true)
+  const onCloseAssignPlan = () => setOpenAssignPlan(false)
+
   // const [appData, setAppData] = useState([])
   const [userPermission, setUserPermission] = useState([])
 
-  const [userCreateRights, setUserCreateRights] = useState([])
-  const [userOpenRights, setUserOpenRights] = useState(false)
-
+  // const refresh = () => getTasks()
   // const [create, setCreate] = useState({})
   // const [open, setOpen] = useState({})
   // const [todo, setToDo] = useState({})
@@ -85,6 +91,17 @@ function Home() {
     border: "2px solid #000",
     boxShadow: 24,
     p: 4
+  }
+
+  // console.log(plans)
+
+  async function getPlans() {
+    const response = await Axios.get("http://localhost:8080/getPlans")
+    if (response.data) {
+      let planArrObj = response.data
+      console.log(planArrObj)
+      setPlans(planArrObj)
+    }
   }
 
   async function updateStatus(iD, status) {
@@ -215,7 +232,7 @@ function Home() {
   //   )
   // }, userPermission)
 
-  console.log(userCreateRights)
+  // console.log(userCreateRights)
   // console.log(userOpenRights)
 
   return (
@@ -235,7 +252,7 @@ function Home() {
                   {items
                     .filter(i => i.Task_state === s.Task_state)
                     .map((i, idx) => (
-                      <Item key={i.Task_id} item={i} index={idx} moveItem={moveItem} status={s} />
+                      <Item key={i.Task_id} item={i} index={idx} moveItem={moveItem} status={s} userPermission={userPermission} items={items} setItems={setItems} />
                     ))}
                 </Col>
               </DropWrapper>
@@ -265,15 +282,23 @@ function Home() {
                     </div>
 
                     <br></br>
+
                     <button onClick={onOpenTask} className="button-create">
                       New Task
                     </button>
                     <br></br>
-                    <button onClick={onOpenCreatePlan} className="button-create">
-                      New Plan
-                    </button>
-                    <br></br>
-                    <button className="button-create">Assign Plan</button>
+
+                    <div className="buttons">
+                      <div className="action_btn">
+                        <button onClick={onOpenCreatePlan} className="button-create action_btn btn-left">
+                          New Plan
+                        </button>
+
+                        <button onClick={onOpenAssignPlan} className="button-create action_btn btn-right">
+                          Assign Plan
+                        </button>
+                      </div>
+                    </div>
                   </>
                 ) : // !AOC
                 s.Task_state === "open" &&
@@ -289,11 +314,17 @@ function Home() {
                       New Task
                     </button>
                     <br></br>
-                    <button onClick={onOpenCreatePlan} className="button-create">
-                      New Plan
-                    </button>
-                    <br></br>
-                    <button className="button-create">Assign Plan</button>
+                    <div className="buttons">
+                      <div className="action_btn">
+                        <button onClick={onOpenCreatePlan} className="button-create action_btn btn-left">
+                          New Plan
+                        </button>
+
+                        <button onClick={onOpenAssignPlan} className="button-create action_btn btn-right">
+                          Assign Plan
+                        </button>
+                      </div>
+                    </div>
                   </>
                 ) : // !A!O C
                 s.Task_state === "open" &&
@@ -340,11 +371,17 @@ function Home() {
                       </div>
                     </div>
                     <br></br>
-                    <button onClick={onOpenCreatePlan} className="button-create">
-                      New Plan
-                    </button>
-                    <br></br>
-                    <button className="button-create">Assign Plan</button>
+                    <div className="buttons">
+                      <div className="action_btn">
+                        <button onClick={onOpenCreatePlan} className="button-create action_btn btn-left">
+                          New Plan
+                        </button>
+
+                        <button onClick={onOpenAssignPlan} className="button-create action_btn btn-right">
+                          Assign Plan
+                        </button>
+                      </div>
+                    </div>
                   </>
                 ) : // A !O !C
                 s.Task_state === "open" &&
@@ -377,11 +414,17 @@ function Home() {
                     return e.App_permit_Create
                   }) === false ? (
                   <>
-                    <button onClick={onOpenCreatePlan} className="button-create">
-                      New Plan
-                    </button>
-                    <br></br>
-                    <button className="button-create">Assign Plan</button>
+                    <div className="buttons">
+                      <div className="action_btn">
+                        <button onClick={onOpenCreatePlan} className="button-create action_btn btn-left">
+                          New Plan
+                        </button>
+
+                        <button onClick={onOpenAssignPlan} className="button-create action_btn btn-right">
+                          Assign Plan
+                        </button>
+                      </div>
+                    </div>
                   </>
                 ) : // A !O C
                 s.Task_state === "open" &&
@@ -418,9 +461,10 @@ function Home() {
       </div>
       {/* <button onClick={() => getTasks()}>TEst </button> */}
       <CreateNewAppWindow open={openApp} onClose={onCloseApp} />
-      <CreateNewTaskWindow open={openTask} onClose={onCloseTask} userPermission={userPermission} />
+      <CreateNewTaskWindow open={openTask} onClose={onCloseTask} userPermission={userPermission} items={items} setItems={setItems} />
       <EditAppWindow open={openEditApp} onClose={onCloseEditApp} />
       <CreateNewPlanWindow open={openCreatePlan} onClose={onCloseCreatePlan} userPermission={userPermission} />
+      <AssignPlanWindow open={openAssignPlan} onClose={onCloseAssignPlan} userPermission={userPermission} />
     </DndProvider>
 
     // </>

@@ -1,4 +1,4 @@
-const { check, body } = require("express-validator")
+const { check } = require("express-validator")
 const db = require("../models/dbcon")
 
 // function used to validate if username exists in database
@@ -85,6 +85,24 @@ function isTaskNameInUse(app, taskname) {
   return new Promise((resolve, reject) => {
     let sql = `SELECT COUNT(*) AS total FROM nodelogin.task WHERE LOWER(Task_app_Acronym) = ? AND LOWER(Task_name) = ? `
     db.query(sql, [app, taskname], (err, result) => {
+      if (!err) {
+        return resolve(result[0].total > 0)
+      } else {
+        return reject(new Error("Database Error"))
+      }
+    })
+  })
+}
+
+function checkPlanDates(planname) {
+  console.log(planname)
+  return new Promise((resolve, reject) => {
+    var today = new Date()
+    var month = today.getMonth() + 1 < 10 ? "0" + (today.getMonth() + 1) : today.getMonth() + 1
+    var day = today.getDate() < 10 ? "0" + today.getDate() : today.getDate()
+    var date = today.getFullYear() + "-" + month + "-" + day
+    let sql = `SELECT COUNT(*) AS total FROM nodelogin.plan WHERE LOWER(Plan_MVP_name) = ? and (Plan_startDate > ? or  Plan_endDate < ?)`
+    db.query(sql, [planname, date, date], (err, result) => {
       if (!err) {
         return resolve(result[0].total > 0)
       } else {
@@ -217,5 +235,16 @@ module.exports = {
         throw new Error("You have to enter a unique task name for each application")
       }
     })
-    .withMessage("You have to enter a unique task name for each application")
+    .withMessage("You have to enter a unique task name for each application"),
+
+  validateAssignPlanToTask: check(["plan"])
+    .custom(async planname => {
+      // console.log(planname)
+      const value = await checkPlanDates(planname)
+      // console.log(value)
+      if (value) {
+        throw new Error("Plan start and end dates do not fall within this period, please pick a different plan.")
+      }
+    })
+    .withMessage("Plan start and end dates do not fall within this period, please pick a different plan.")
 }

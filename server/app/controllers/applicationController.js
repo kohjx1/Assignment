@@ -74,7 +74,8 @@ exports.createTask = (req, res) => {
   const state = "open"
 
   var today = new Date()
-  var date = today.getFullYear() + "-" + (today.getMonth() + 1) + "-" + today.getDate()
+
+  var date = today.getFullYear() + "-" + (today.getMonth() + 1 < 10 ? "0" + (today.getMonth() + 1) : today.getMonth() + 1) + "-" + (today.getDate() + 1 < 10 ? "0" + (today.getDate() + 1) : today.getDate() + 1)
   if (today.getMinutes() < 10) {
     var time = today.getHours() + ":0" + today.getMinutes() + ":" + today.getSeconds()
   } else {
@@ -182,4 +183,18 @@ exports.createPlan = (req, res) => {
       }
     })
   }
+}
+
+exports.assignPlan = (req, res) => {
+  const { taskID, plan } = req.body
+  console.log(taskID, plan)
+  let sql = "UPDATE nodelogin.task SET `Task_plan` = ? WHERE `Task_id` = ?"
+  db.query(sql, [plan, taskID], (err, result) => {
+    if (err) {
+      throw err
+    } else {
+      console.log(`Successfully updated plan for task id: ${taskID} `)
+      res.send(result)
+    }
+  })
 }

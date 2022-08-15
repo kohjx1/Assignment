@@ -2,8 +2,9 @@ import React, { useState, useEffect } from "react"
 // import Modal from "react-modal"
 import { FormHelperText, Collapse, Alert, Button, Select, OutlinedInput, ListItemText, Checkbox, InputLabel, MenuItem, FormControl, Grid, Modal, Box, TextField } from "@mui/material"
 import Axios from "axios"
+import { data, statuses } from "../../data/index"
 
-const CreateNewTaskWindow = ({ open, onClose, userPermission }) => {
+const CreateNewTaskWindow = ({ open, onClose, userPermission, items, setItems }) => {
   const [name, setName] = useState("")
   const [description, setDescription] = useState("")
   const [notes, setNotes] = useState("")
@@ -27,6 +28,25 @@ const CreateNewTaskWindow = ({ open, onClose, userPermission }) => {
     setApp("")
   }
 
+  const Child = async () => {
+    try {
+      const response = await Axios.get("http://localhost:8080/getTasks")
+
+      // console.log(response.data)
+      let tmp = []
+      for (var i = 0; i < response.data.length; i++) {
+        let mapping = statuses.find(si => si.Task_state === response.data[i].Task_state)
+        let data = { ...response.data[i] }
+        data.icon = mapping.icon
+        tmp.push(data)
+      }
+      // console.log(tmp)
+      setItems(tmp)
+    } catch (e) {
+      console.log(e)
+      return
+    }
+  }
   console.log(userPermission.filter(e => e.App_permit_Create === true))
   // console.log(apps)
 
@@ -153,7 +173,8 @@ const CreateNewTaskWindow = ({ open, onClose, userPermission }) => {
           setErrors(err)
         } else {
           setSuccess(true)
-          window.location.reload()
+          Child()
+          // window.location.reload()
           resetValues()
         }
       } catch (e) {
@@ -269,6 +290,7 @@ const CreateNewTaskWindow = ({ open, onClose, userPermission }) => {
               >
                 {renderList(plans)}
               </Select>
+              <FormHelperText sx={{ color: "red" }}>{getError(errors, "plan")}</FormHelperText>
             </FormControl>
           </Grid>
 

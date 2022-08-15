@@ -342,3 +342,9 @@ p {
 .btn-left {
   margin-right: 3px;
 }
+
+.item-wrap {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: space-between;
+}
