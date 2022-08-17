@@ -3,6 +3,7 @@ import { useDrag, useDrop } from "react-dnd"
 import Window from "./Window"
 import ITEM_TYPE from "../../data/types"
 import Axios from "axios"
+import { data, statuses } from "../../data/index"
 
 const Item = ({ item, index, moveItem, status, userPermission, items, setItems }) => {
   const ref = useRef(null)
@@ -41,6 +42,7 @@ const Item = ({ item, index, moveItem, status, userPermission, items, setItems }
       }
 
       // change the card position
+
       moveItem(dragIndex, hoverIndex)
       item.index = hoverIndex
     }
@@ -66,25 +68,29 @@ const Item = ({ item, index, moveItem, status, userPermission, items, setItems }
   // so that item can be dropped and also dragged
   drag(drop(ref))
 
-  // console.log(plans)
-  // console.log(item)
-  // console.log(planname)
-  // const planFiltered = plans.filter(i => i.Plan_MVP_name === item.Task_plan)
-  // console.log(planFiltered)
-  // // const planFiltered = plans.filter(i => i.Plan_MVP_name === item.Task_plan)
-  // // console.log(planFiltered)
-  // const startdate = planFiltered.Plan_startDate
-  // const enddate = planFiltered.Plan_endDate
-  // console.log(startdate)
-  // console.log(enddate)
+  const Child = async () => {
+    try {
+      const response = await Axios.get("http://localhost:8080/getTasks")
 
-  // function getDates(planname) {
-  //   const planFiltered = plans.filter(i => i.Plan_MVP_name === planname)[0]
-  //   let startDate = planFiltered
-  //   console.log(startDate)
-  //   return startDate
-  // }
+      // console.log(response.data)
+      let tmp = []
+      for (var i = 0; i < response.data.length; i++) {
+        let mapping = statuses.find(si => si.Task_state === response.data[i].Task_state)
+        let data = { ...response.data[i] }
+        data.icon = mapping.icon
+        tmp.push(data)
+      }
+      // console.log(tmp)
+      setItems(tmp)
+    } catch (e) {
+      console.log(e)
+      return
+    }
+  }
 
+  useEffect(() => {
+    Child()
+  }, [show])
   // console.log(userPermission.filter(e => e.appName === item.Task_app_Acronym)[0].App_permit_toDoList)
 
   return (

@@ -1,5 +1,5 @@
 const { check } = require("express-validator")
-const db = require("../models/dbcon")
+const db = require("../connections/dbcon")
 
 // function used to validate if username exists in database
 function isUsernameInUse(username) {
@@ -94,23 +94,23 @@ function isTaskNameInUse(app, taskname) {
   })
 }
 
-function checkPlanDates(planname) {
-  console.log(planname)
-  return new Promise((resolve, reject) => {
-    var today = new Date()
-    var month = today.getMonth() + 1 < 10 ? "0" + (today.getMonth() + 1) : today.getMonth() + 1
-    var day = today.getDate() < 10 ? "0" + today.getDate() : today.getDate()
-    var date = today.getFullYear() + "-" + month + "-" + day
-    let sql = `SELECT COUNT(*) AS total FROM nodelogin.plan WHERE LOWER(Plan_MVP_name) = ? and (Plan_startDate > ? or  Plan_endDate < ?)`
-    db.query(sql, [planname, date, date], (err, result) => {
-      if (!err) {
-        return resolve(result[0].total > 0)
-      } else {
-        return reject(new Error("Database Error"))
-      }
-    })
-  })
-}
+// function checkPlanDates(planname) {
+//   console.log(planname)
+//   return new Promise((resolve, reject) => {
+//     var today = new Date()
+//     var month = today.getMonth() + 1 < 10 ? "0" + (today.getMonth() + 1) : today.getMonth() + 1
+//     var day = today.getDate() < 10 ? "0" + today.getDate() : today.getDate()
+//     var date = today.getFullYear() + "-" + month + "-" + day
+//     let sql = `SELECT COUNT(*) AS total FROM nodelogin.plan WHERE LOWER(Plan_MVP_name) = ? and (Plan_startDate > ? or  Plan_endDate < ?)`
+//     db.query(sql, [planname, date, date], (err, result) => {
+//       if (!err) {
+//         return resolve(result[0].total > 0)
+//       } else {
+//         return reject(new Error("Database Error"))
+//       }
+//     })
+//   })
+// }
 
 module.exports = {
   validateEmail: check("email").trim().notEmpty().withMessage("You have to enter an Email Address").isEmail().withMessage("Invalid Email Address"),
@@ -237,14 +237,17 @@ module.exports = {
     })
     .withMessage("You have to enter a unique task name for each application"),
 
-  validateAssignPlanToTask: check(["plan"])
-    .custom(async planname => {
-      // console.log(planname)
-      const value = await checkPlanDates(planname)
-      // console.log(value)
-      if (value) {
-        throw new Error("Plan start and end dates do not fall within this period, please pick a different plan.")
+  validateAppStartDate: check(["startDate", "endDate"])
+    .trim()
+    .notEmpty()
+    .withMessage("You need to initialize start date for Applications")
+    .custom(async (e, appSelected) => {
+      const start = appSelected.req.body.startDate
+      const end = appSelected.req.body.endDate
+
+      if (start > end) {
+        throw new Error("Invalid Date selection")
       }
     })
-    .withMessage("Plan start and end dates do not fall within this period, please pick a different plan.")
+    .withMessage("Invalid Date Selection")
 }

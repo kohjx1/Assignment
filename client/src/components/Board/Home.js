@@ -66,34 +66,7 @@ function Home() {
   const onOpenAssignPlan = () => setOpenAssignPlan(true)
   const onCloseAssignPlan = () => setOpenAssignPlan(false)
 
-  // const [appData, setAppData] = useState([])
   const [userPermission, setUserPermission] = useState([])
-
-  // const refresh = () => getTasks()
-  // const [create, setCreate] = useState({})
-  // const [open, setOpen] = useState({})
-  // const [todo, setToDo] = useState({})
-  // const [doing, setDoing] = useState({})
-  // const [done, setDone] = useState({})
-
-  // const refresh = getTasks()
-  const [username, setUsername] = useState(sessionStorage.getItem("username"))
-
-  const style = {
-    position: "absolute",
-    top: "50%",
-    left: "50%",
-    transform: "translate(-50%, -50%)",
-    width: 700,
-    height: 700,
-    bgcolor: "background.paper",
-    backgroundColor: "#333",
-    border: "2px solid #000",
-    boxShadow: 24,
-    p: 4
-  }
-
-  // console.log(plans)
 
   async function getPlans() {
     const response = await Axios.get("http://localhost:8080/getPlans")
@@ -113,9 +86,28 @@ function Home() {
     }
   }
 
+  async function updateTransition(id, state, username, prevNote) {
+    try {
+      const response = Axios.post("http://localhost:8080/updateTransition", { id: id, state: state, username: username, prevNote: prevNote })
+    } catch (e) {
+      console.log(e)
+      return
+    }
+  }
+
+  async function sendEmail(taskID, taskName, taskOwner, taskAppName, taskPlan) {
+    try {
+      const response = Axios.post("http://localhost:8080/sendEmail", { taskID: taskID, taskName: taskName, taskOwner: taskOwner, taskAppName: taskAppName, taskPlan: taskPlan })
+    } catch (e) {
+      console.log(e)
+      return
+    }
+  }
+
   // change statuses of the items as it is dropped into a new column
   const onDrop = (item, monitor, status) => {
     // after dropping new item to new column, find the status of that new column
+
     const mapping = statuses.find(si => si.Task_state === status)
 
     // filter out items to not contain dropped item, then add back the dropped item information with new status and icon
@@ -125,8 +117,14 @@ function Home() {
       return [...newItems]
     })
 
+    updateTransition(item.Task_id, status, sessionStorage.getItem("username"), item.Task_notes)
+
+    if (status === "done") {
+      sendEmail(item.Task_id, item.Task_name, item.Task_owner, item.Task_app_Acronym, item.Task_plan)
+    }
     // update task status in database
-    updateStatus(item.Task_id, status)
+
+    // updateStatus(item.Task_id, status)
   }
 
   const moveItem = (dragIndex, hoverIndex) => {
@@ -195,7 +193,7 @@ function Home() {
       accessArr.push(rowOutcome)
     }
     //
-    console.log(accessArr)
+    // console.log(accessArr)
     setUserPermission(accessArr)
   }
 
@@ -214,13 +212,14 @@ function Home() {
   // if done --> move to doing || close
 
   // testing
-  const [group, setGroup] = useState("PL")
+  // const [group, setGroup] = useState("PL")
 
   useEffect(() => {
     getTasks()
   }, [])
+
   //??
-  console.log(userPermission)
+  // console.log(userPermission)
   //
   //
 
@@ -239,14 +238,14 @@ function Home() {
     // <>
 
     <DndProvider backend={HTML5Backend}>
-      <KanbanHeader group={group} />
+      {/* <KanbanHeader group={group} /> */}
       <div className={"row"}>
         {/* s is the status data */}
         {statuses.map(s => {
           return (
             <div key={s.Task_state} className={"col-wrapper"}>
               <h2 className={"col-header"}>{s.Task_state.toUpperCase()}</h2>
-              <DropWrapper onDrop={onDrop} status={s.Task_state} group={group} userPermission={userPermission}>
+              <DropWrapper onDrop={onDrop} status={s.Task_state} userPermission={userPermission} items={items} setItems={setItems}>
                 <Col>
                   {/* i is the item data mapping to each individual item key */}
                   {items
@@ -288,17 +287,9 @@ function Home() {
                     </button>
                     <br></br>
 
-                    <div className="buttons">
-                      <div className="action_btn">
-                        <button onClick={onOpenCreatePlan} className="button-create action_btn btn-left">
-                          New Plan
-                        </button>
-
-                        <button onClick={onOpenAssignPlan} className="button-create action_btn btn-right">
-                          Assign Plan
-                        </button>
-                      </div>
-                    </div>
+                    <button onClick={onOpenCreatePlan} className="button-create">
+                      New Plan
+                    </button>
                   </>
                 ) : // !AOC
                 s.Task_state === "open" &&
@@ -314,17 +305,9 @@ function Home() {
                       New Task
                     </button>
                     <br></br>
-                    <div className="buttons">
-                      <div className="action_btn">
-                        <button onClick={onOpenCreatePlan} className="button-create action_btn btn-left">
-                          New Plan
-                        </button>
-
-                        <button onClick={onOpenAssignPlan} className="button-create action_btn btn-right">
-                          Assign Plan
-                        </button>
-                      </div>
-                    </div>
+                    <button onClick={onOpenCreatePlan} className="button-create">
+                      New Plan
+                    </button>
                   </>
                 ) : // !A!O C
                 s.Task_state === "open" &&
@@ -349,7 +332,7 @@ function Home() {
                   userPermission.some(function (e, i) {
                     return e.App_permit_Close
                   }) === false ? (
-                  <>""</>
+                  ""
                 ) : // A O !C
                 s.Task_state === "open" &&
                   sessionStorage.getItem("username") === "admin" &&
@@ -371,17 +354,9 @@ function Home() {
                       </div>
                     </div>
                     <br></br>
-                    <div className="buttons">
-                      <div className="action_btn">
-                        <button onClick={onOpenCreatePlan} className="button-create action_btn btn-left">
-                          New Plan
-                        </button>
-
-                        <button onClick={onOpenAssignPlan} className="button-create action_btn btn-right">
-                          Assign Plan
-                        </button>
-                      </div>
-                    </div>
+                    <button onClick={onOpenCreatePlan} className="button-create">
+                      New Plan
+                    </button>
                   </>
                 ) : // A !O !C
                 s.Task_state === "open" &&
@@ -414,17 +389,9 @@ function Home() {
                     return e.App_permit_Create
                   }) === false ? (
                   <>
-                    <div className="buttons">
-                      <div className="action_btn">
-                        <button onClick={onOpenCreatePlan} className="button-create action_btn btn-left">
-                          New Plan
-                        </button>
-
-                        <button onClick={onOpenAssignPlan} className="button-create action_btn btn-right">
-                          Assign Plan
-                        </button>
-                      </div>
-                    </div>
+                    <button onClick={onOpenCreatePlan} className="button-create">
+                      New Plan
+                    </button>
                   </>
                 ) : // A !O C
                 s.Task_state === "open" &&

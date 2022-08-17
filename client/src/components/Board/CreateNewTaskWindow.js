@@ -8,11 +8,11 @@ const CreateNewTaskWindow = ({ open, onClose, userPermission, items, setItems })
   const [name, setName] = useState("")
   const [description, setDescription] = useState("")
   const [notes, setNotes] = useState("")
-  const [selectedPlans, setSelectedPlans] = useState("")
+  // const [selectedPlans, setSelectedPlans] = useState("")
   const [app, setApp] = useState("")
 
   // to collect initial data
-  const [plans, setPlans] = useState([])
+  // const [plans, setPlans] = useState([])
   const [apps, setApps] = useState([])
 
   const [success, setSuccess] = useState(false)
@@ -24,7 +24,7 @@ const CreateNewTaskWindow = ({ open, onClose, userPermission, items, setItems })
     setName("")
     setDescription("")
     setNotes("")
-    setSelectedPlans("")
+    // setSelectedPlans("")
     setApp("")
   }
 
@@ -47,7 +47,7 @@ const CreateNewTaskWindow = ({ open, onClose, userPermission, items, setItems })
       return
     }
   }
-  console.log(userPermission.filter(e => e.App_permit_Create === true))
+  // console.log(userPermission.filter(e => e.App_permit_Create === true))
   // console.log(apps)
 
   const ITEM_HEIGHT = 48
@@ -75,25 +75,25 @@ const CreateNewTaskWindow = ({ open, onClose, userPermission, items, setItems })
     p: 4
   }
 
-  console.log(app)
-  async function getPlans(e) {
-    try {
-      const response = await Axios.get("http://localhost:8080/getPlans")
+  // console.log(app)
+  // async function getPlans(e) {
+  //   try {
+  //     const response = await Axios.get("http://localhost:8080/getPlans")
 
-      let plans = response.data
-      let plansArr = plans.filter(e => e.Plan_app_Acronym === app)
-      console.log(plansArr)
-      let tmp = []
-      for (var i = 0; i < plansArr.length; i++) {
-        tmp.push(plansArr[i].Plan_MVP_name)
-      }
-      console.log(tmp)
-      setPlans(tmp)
-    } catch (e) {
-      console.log("There was a problem")
-      return
-    }
-  }
+  //     let plans = response.data
+  //     let plansArr = plans.filter(e => e.Plan_app_Acronym === app)
+  //     console.log(plansArr)
+  //     let tmp = []
+  //     for (var i = 0; i < plansArr.length; i++) {
+  //       tmp.push(plansArr[i].Plan_MVP_name)
+  //     }
+  //     console.log(tmp)
+  //     setPlans(tmp)
+  //   } catch (e) {
+  //     console.log("There was a problem")
+  //     return
+  //   }
+  // }
 
   async function getApps(e) {
     try {
@@ -120,7 +120,7 @@ const CreateNewTaskWindow = ({ open, onClose, userPermission, items, setItems })
   }
 
   useEffect(() => {
-    getPlans()
+    // getPlans()
     getApps()
   }, [open])
 
@@ -166,7 +166,7 @@ const CreateNewTaskWindow = ({ open, onClose, userPermission, items, setItems })
       var id = response.data[0].App_Acronym + "_" + num
       console.log(id)
       try {
-        const responseCreate = await Axios.post("http://localhost:8080/createTask", { app: app, name: name, description: description, notes: notes, plan: selectedPlans, creator: sessionStorage.getItem("username"), id: id })
+        const responseCreate = await Axios.post("http://localhost:8080/createTask", { app: app, name: name, description: description, notes: notes, creator: sessionStorage.getItem("username"), id: id })
         const err = responseCreate.data.errors
         if (err) {
           console.log(err)
@@ -190,16 +190,16 @@ const CreateNewTaskWindow = ({ open, onClose, userPermission, items, setItems })
   useEffect(() => {
     resetValues()
   }, [onClose])
-  console.log(selectedPlans)
-  console.log(app)
+  // console.log(selectedPlans)
+  // console.log(app)
 
   const handleChange = e => {
     setApp(e.target.value)
   }
 
-  useEffect(() => {
-    getPlans()
-  }, [app])
+  // useEffect(() => {
+  //   getPlans()
+  // }, [app])
 
   return (
     <Modal keepMounted open={open} onClose={onClose} aria-labelledby="keep-mounted-modal-title" aria-describedby="keep-mounted-modal-description">
@@ -277,7 +277,7 @@ const CreateNewTaskWindow = ({ open, onClose, userPermission, items, setItems })
             />
           </Grid>
 
-          <Grid item>
+          {/* <Grid item>
             <FormControl fullWidth variant="filled" sx={{ bgcolor: "white", fontWeight: "fontWeightLight", borderRadius: 2 }}>
               <InputLabel id="demo-simple-select-filled-label">Plan</InputLabel>
               <Select
@@ -292,7 +292,7 @@ const CreateNewTaskWindow = ({ open, onClose, userPermission, items, setItems })
               </Select>
               <FormHelperText sx={{ color: "red" }}>{getError(errors, "plan")}</FormHelperText>
             </FormControl>
-          </Grid>
+          </Grid> */}
 
           <Grid item>
             <Button onClick={addTask} type="submit" color="primary" variant="contained" fullWidth>

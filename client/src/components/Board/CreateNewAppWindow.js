@@ -8,7 +8,7 @@ import Axios from "axios"
 // console.log(moment().format("DD-MM-YYYYThh:mm:ss"))
 
 // whether to show the window, what you do when close window and the actual item and the data associated with the item
-const CreateNewAppWindow = ({ open, onClose }) => {
+const CreateNewAppWindow = ({ open, onClose, items, setItems }) => {
   const [name, setName] = useState("")
   const [description, setDescription] = useState("")
   const [runningNumber, setRunningNumber] = useState("")
@@ -24,7 +24,6 @@ const CreateNewAppWindow = ({ open, onClose }) => {
   const [names, setNames] = useState([])
   const [errors, setErrors] = useState("")
   const [success, setSuccess] = useState(false)
-  const [fail, setFail] = useState(false)
 
   // console.log(startDate)
   const resetValues = () => {
@@ -37,16 +36,15 @@ const CreateNewAppWindow = ({ open, onClose }) => {
     setDoneState([])
     setStartDate("")
     setEndDate("")
-    setRunningNumber()
+    setRunningNumber("")
   }
 
   useEffect(() => {
     const timeout = setTimeout(() => {
-      setFail(false)
       setErrors(false)
     }, 1000)
     return () => clearTimeout(timeout)
-  }, [fail])
+  }, [errors])
 
   useEffect(() => {
     const timeout = setTimeout(() => {
@@ -105,10 +103,10 @@ const CreateNewAppWindow = ({ open, onClose }) => {
       const err = response.data.errors
 
       if (err) {
-        setErrors(getError(err, "name"))
-        setFail(true)
+        setErrors(err)
       } else {
         setSuccess(true)
+
         resetValues()
       }
     } catch (e) {
@@ -154,8 +152,8 @@ const CreateNewAppWindow = ({ open, onClose }) => {
               onChange={e => {
                 setName(e.target.value)
               }}
-              error={fail ? true : false}
-              helperText={errors}
+              error={getError(errors, "name") ? true : false}
+              helperText={getError(errors, "name")}
             />
           </Grid>
 
@@ -205,6 +203,8 @@ const CreateNewAppWindow = ({ open, onClose }) => {
                 setStartDate(e.target.value)
               }}
               type="date"
+              error={getError(errors, "startDate") ? true : false}
+              helperText={getError(errors, "startDate")}
             />
           </Grid>
 
@@ -222,6 +222,8 @@ const CreateNewAppWindow = ({ open, onClose }) => {
                 setEndDate(e.target.value)
               }}
               type="date"
+              error={getError(errors, "endDate") ? true : false}
+              helperText={getError(errors, "endDate")}
             />
           </Grid>
 

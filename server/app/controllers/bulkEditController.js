@@ -1,4 +1,4 @@
-const db = require("../models/dbcon")
+const db = require("../connections/dbcon")
 var path = require("path")
 const { validationResult, check } = require("express-validator")
 const config = require("dotenv")

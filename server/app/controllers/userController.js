@@ -1,4 +1,4 @@
-const db = require("../models/dbcon")
+const db = require("../connections/dbcon")
 const { validationResult, check } = require("express-validator")
 const { validEmail } = require("../validation/Regex")
 

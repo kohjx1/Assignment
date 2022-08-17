@@ -2,6 +2,7 @@ import React, { useState, useEffect } from "react"
 // import Modal from "react-modal"
 import { Collapse, Alert, Button, Select, OutlinedInput, ListItemText, Checkbox, InputLabel, MenuItem, FormControl, Grid, Modal, Box, TextField } from "@mui/material"
 import Axios from "axios"
+import { data, statuses } from "../../data/index"
 
 function EditAppWindow({ open, onClose }) {
   const ITEM_HEIGHT = 48
@@ -46,6 +47,11 @@ function EditAppWindow({ open, onClose }) {
   const [newEndDate, setNewEndDate] = useState("")
 
   const [success, setSuccess] = useState(false)
+  const [errors, setErrors] = useState("")
+
+  useEffect(() => {
+    getApplications()
+  }, [open])
 
   useEffect(() => {
     const timeout = setTimeout(() => {
@@ -103,6 +109,13 @@ function EditAppWindow({ open, onClose }) {
   }
   // console.log(newToDo)
 
+  useEffect(() => {
+    const timeout = setTimeout(() => {
+      setErrors(false)
+    }, 1000)
+    return () => clearTimeout(timeout)
+  }, [errors])
+
   async function getGroups(e) {
     try {
       const response = await Axios.get("http://localhost:8080/getDistinctGroups")
@@ -120,8 +133,12 @@ function EditAppWindow({ open, onClose }) {
 
   async function updateAppData(e) {
     try {
-      const response = await Axios.post("http://localhost:8080/updateApplication", { appname: appName, description: newDescription, create: newCreate, open: newOpen, todo: newToDo, doing: newDoing, done: newDone, startdate: newStartDate, enddate: newEndDate })
-      if (response) {
+      const response = await Axios.post("http://localhost:8080/updateApplication", { appname: appName, description: newDescription, create: newCreate, open: newOpen, todo: newToDo, doing: newDoing, done: newDone, startDate: newStartDate, endDate: newEndDate })
+      const err = response.data.errors
+
+      if (err) {
+        setErrors(err)
+      } else {
         setSuccess(true)
         // resetValues()
       }
@@ -157,10 +174,15 @@ function EditAppWindow({ open, onClose }) {
   const renderList = item => {
     return item.map(e => <MenuItem value={e}>{e}</MenuItem>)
   }
-  console.log(names)
-  console.log(newCreate)
-  console.log(newOpen)
-  console.log(newToDo)
+
+  const getError = (errors, prop) => {
+    try {
+      return errors.filter(e => e.param === prop)[0].msg
+    } catch (error) {
+      return ""
+    }
+  }
+
   return (
     <Modal keepMounted open={open} onClose={onClose} aria-labelledby="keep-mounted-modal-title" aria-describedby="keep-mounted-modal-description">
       <Box sx={style}>
@@ -219,6 +241,9 @@ function EditAppWindow({ open, onClose }) {
                 setNewStartDate(e.target.value)
               }}
               type="date"
+              disabled
+              error={getError(errors, "startDate") ? true : false}
+              helperText={getError(errors, "startDate")}
             />
           </Grid>
 
@@ -236,6 +261,9 @@ function EditAppWindow({ open, onClose }) {
                 setNewEndDate(e.target.value)
               }}
               type="date"
+              disabled
+              error={getError(errors, "endDate") ? true : false}
+              helperText={getError(errors, "endDate")}
             />
           </Grid>
 

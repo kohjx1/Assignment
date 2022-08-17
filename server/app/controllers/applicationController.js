@@ -1,4 +1,4 @@
-const db = require("../models/dbcon")
+const db = require("../connections/dbcon")
 const { validationResult, check } = require("express-validator")
 var path = require("path")
 const config = require("dotenv")
@@ -69,7 +69,7 @@ exports.getPlans = (req, res) => {
 }
 
 exports.createTask = (req, res) => {
-  const { name, description, notes, app, plan, creator, id } = req.body
+  const { name, description, notes, app, creator, id } = req.body
 
   const state = "open"
 
@@ -82,14 +82,25 @@ exports.createTask = (req, res) => {
     var time = today.getHours() + ":" + today.getMinutes() + ":" + today.getSeconds()
   }
   var datetime = date + " " + time
+  var auditNote = `Date: ${date}        Time: ${time}        User: ${creator}        State: open`
+
+  if (notes && !description) {
+    var newNote = auditNote + `\r\nNotes: ${notes}\n\n`
+  } else if (!notes && description) {
+    var newNote = auditNote + `\r\nDescription: ${description}\n\n`
+  } else if (notes && description) {
+    var newNote = auditNote + `\r\nDescription: ${description}` + `\r\nNote: ${notes}\n\n`
+  } else {
+    var newNote = ""
+  }
 
   const errors = validationResult(req)
   if (!errors.isEmpty()) {
     console.log(errors)
     return res.send(errors)
   } else {
-    let sql = "INSERT INTO nodelogin.task SET `Task_name` = ?, `Task_Description` = ?, `Task_notes` = ?, `Task_id` = ?, `Task_plan` = ?, `Task_app_Acronym` = ?, `Task_state` = ?, `Task_creator` = ?, `Task_owner` = ?, `Task_createDate` = ?"
-    db.query(sql, [name, description, notes, id, plan, app, state, creator, creator, datetime], (err, result) => {
+    let sql = "INSERT INTO nodelogin.task SET `Task_name` = ?, `Task_Description` = ?, `Task_notes` = ?, `Task_id` = ?, `Task_app_Acronym` = ?, `Task_state` = ?, `Task_creator` = ?, `Task_owner` = ?, `Task_createDate` = ?"
+    db.query(sql, [name, description, newNote, id, app, state, creator, creator, datetime], (err, result) => {
       if (err) {
         throw err
       } else {
@@ -152,17 +163,23 @@ exports.getSpecificAppDetails = (req, res) => {
 }
 
 exports.updateApplication = (req, res) => {
-  const { appname, description, create, open, todo, doing, done, startdate, enddate } = req.body
-  console.log(appname, description, create, open, todo, doing, done, startdate, enddate)
-  let sql = "UPDATE nodelogin.application SET `App_Description` = ?, `App_permit_Create` = ?, `App_permit_Open` = ?, `App_permit_toDoList` = ?, `App_permit_Doing` = ?, `App_permit_Done` = ?, `App_startDate` = ?, `App_endDate` = ? WHERE `App_Acronym` = ?"
-  db.query(sql, [description, `${create}`, `${open}`, `${todo}`, `${doing}`, `${done}`, startdate, enddate, appname], (err, result) => {
-    if (err) {
-      throw err
-    } else {
-      console.log("Successfully edited application data")
-      res.send(result)
-    }
-  })
+  const { appname, description, create, open, todo, doing, done, startDate, endDate } = req.body
+  console.log(appname, description, create, open, todo, doing, done, startDate, endDate)
+
+  const errors = validationResult(req)
+  if (!errors.isEmpty()) {
+    return res.send(errors)
+  } else {
+    let sql = "UPDATE nodelogin.application SET `App_Description` = ?, `App_permit_Create` = ?, `App_permit_Open` = ?, `App_permit_toDoList` = ?, `App_permit_Doing` = ?, `App_permit_Done` = ?, `App_startDate` = ?, `App_endDate` = ? WHERE `App_Acronym` = ?"
+    db.query(sql, [description, `${create}`, `${open}`, `${todo}`, `${doing}`, `${done}`, startDate, endDate, appname], (err, result) => {
+      if (err) {
+        throw err
+      } else {
+        console.log("Successfully edited application data")
+        res.send(result)
+      }
+    })
+  }
 }
 
 exports.createPlan = (req, res) => {
@@ -194,6 +211,48 @@ exports.assignPlan = (req, res) => {
       throw err
     } else {
       console.log(`Successfully updated plan for task id: ${taskID} `)
+      res.send(result)
+    }
+  })
+}
+
+exports.updateTask = (req, res) => {
+  const { username, taskID, note, description } = req.body
+  console.log(username, taskID, note, description)
+
+  let sql = `UPDATE nodelogin.task SET Task_Description = ?, Task_notes = ?, Task_owner = ? WHERE Task_id = ?`
+  db.query(sql, [description, note, username, taskID], (err, result) => {
+    if (err) {
+      throw err
+    } else {
+      console.log(`Successfully updated task for task id: ${taskID} `)
+      res.send(result)
+    }
+  })
+}
+
+exports.updateTransition = (req, res) => {
+  const { id, state, username, prevNote } = req.body
+
+  var today = new Date()
+
+  var date = today.getFullYear() + "-" + (today.getMonth() + 1 < 10 ? "0" + (today.getMonth() + 1) : today.getMonth() + 1) + "-" + (today.getDate() + 1 < 10 ? "0" + (today.getDate() + 1) : today.getDate() + 1)
+  if (today.getMinutes() < 10) {
+    var time = today.getHours() + ":0" + today.getMinutes() + ":" + today.getSeconds()
+  } else {
+    var time = today.getHours() + ":" + today.getMinutes() + ":" + today.getSeconds()
+  }
+
+  var auditNote = `Date: ${date}        Time: ${time}        User: ${username}        State: ${state} \n \n`
+
+  var newNote = prevNote + auditNote
+
+  let sql = `UPDATE nodelogin.task SET Task_notes = ?, Task_owner = ?, Task_state = ? WHERE Task_id = ?`
+  db.query(sql, [newNote, username, state, id], (err, result) => {
+    if (err) {
+      throw err
+    } else {
+      console.log(`Successfully updated task for task id: ${id} `)
       res.send(result)
     }
   })

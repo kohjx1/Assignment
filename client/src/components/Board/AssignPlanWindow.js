@@ -30,11 +30,8 @@ function AssignPlanWindow({ id, item, open, onClose, userPermission, items, setI
     p: 4
   }
 
-  const [tasks, setTasks] = useState([])
   const [plans, setPlans] = useState([])
-  console.log(id)
 
-  const [taskSelected, setTaskSelected] = useState("")
   const [planSelected, setPlanSelected] = useState("")
 
   const Child = async () => {
@@ -88,7 +85,7 @@ function AssignPlanWindow({ id, item, open, onClose, userPermission, items, setI
 
   async function assignPlan(e) {
     try {
-      const response = await Axios.post("http://localhost:8080/assignPlan", { taskID: id, plan: planSelected })
+      const response = await Axios.post("http://localhost:8080/assignPlan", { taskID: id, plan: planSelected }).then(Child())
       Child()
     } catch (e) {
       console.log(e)
@@ -102,30 +99,6 @@ function AssignPlanWindow({ id, item, open, onClose, userPermission, items, setI
   const renderList = item => {
     return item.map(e => <MenuItem value={e}>{e}</MenuItem>)
   }
-
-  const getError = (errors, prop) => {
-    try {
-      return errors.filter(e => e.param === prop)[0].msg
-    } catch (error) {
-      return ""
-    }
-  }
-
-  // useEffect(() => {
-  //   getTasks()
-  // }, [open])
-
-  // useEffect(() => {
-  //   getPlans()
-  // }, [taskSelected])
-
-  // useEffect(() => {
-  //   resetValues()
-  // }, [onClose])
-
-  // console.log(tasks)
-  // console.log(taskSelected)
-  // console.log(plans)
 
   return (
     <Modal keepMounted open={open} onClose={onClose} aria-labelledby="keep-mounted-modal-title" aria-describedby="keep-mounted-modal-description">
