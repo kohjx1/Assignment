@@ -118,7 +118,7 @@ exports.getTasks = (req, res) => {
       throw err
     } else {
       console.log("Retrieved all tasks successfully")
-      res.send(results)
+      res.status(200).send(results)
     }
   })
 }

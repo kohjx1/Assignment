@@ -41,10 +41,10 @@ function isApplicationNameInUse(name) {
   })
 }
 
-function isPlanNameInUse(planname) {
+function isPlanNameInUse(planname, appname) {
   return new Promise((resolve, reject) => {
-    let sql = `SELECT COUNT(*) AS total FROM nodelogin.plan WHERE LOWER(Plan_MVP_name) = ?`
-    db.query(sql, [planname], (err, result) => {
+    let sql = `SELECT COUNT(*) AS total FROM nodelogin.plan WHERE LOWER(Plan_MVP_name) = ? AND LOWER(Plan_app_Acronym) = ?`
+    db.query(sql, [planname, appname], (err, result) => {
       if (!err) {
         return resolve(result[0].total > 0)
       } else {
@@ -162,14 +162,20 @@ module.exports = {
     })
     .withMessage("Application name is already in use"),
 
-  validatePlanName: check("planname")
+  validatePlanName: check(["planname", "appname"])
     .trim()
     .notEmpty()
     .withMessage("You have to enter a unique plan name")
-    .custom(async planname => {
+    .custom(async (e, appSelected) => {
       // console.log(planname)
-      const value = await isPlanNameInUse(planname)
+      const planname = appSelected.req.body.planname
+      const appname = appSelected.req.body.appname
+
+      console.log("planname", planname)
+      console.log("appname", appname)
+      const value = await isPlanNameInUse(planname, appname)
       // console.log(value)
+
       if (value) {
         throw new Error("Plan name is already in use")
       }
