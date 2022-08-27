@@ -239,4 +239,89 @@ exports.PromoteTask2Done = (req, res) => {
   const tpassword = password.trim()
   const tappname = appname.trim()
   const ttaskID = taskID.trim()
+
+  let usersql = `SELECT * FROM nodelogin.accounts WHERE username = ?`
+  db.query(usersql, [tusername], async (err, result) => {
+    if (result.length !== 0) {
+      let dbpassword = result[0].password
+      let isMatch = await bcrypt.compare(tpassword, dbpassword)
+      if (!isMatch || result[0].status === 0) {
+        // unauthorized access
+        return res.status(401).json({
+          success: false,
+          code: 401,
+          message: "Incorrect Credentials"
+        })
+      } else {
+        // check app_permit_doing
+        let appsql = `SELECT * FROM nodelogin.application WHERE App_Acronym = ?`
+        db.query(appsql, [tappname], (err, result) => {
+          if (result.length !== 0) {
+            // then access the group app_permit_doing to see if this guy is part of that group
+            let doing = result[0].App_permit_Doing.split(",")
+
+            let groupsql = `SELECT * FROM nodelogin.groups g WHERE g.groupname IN (`
+            for (var i = 0; i < doing.length; i++) {
+              groupsql += `"${doing[i]}"` + ","
+            }
+            groupsql = groupsql.substring(0, groupsql.length - 1)
+            groupsql = groupsql + ") AND g.username = ?"
+
+            db.query(groupsql, [tusername], (err, result) => {
+              if (result.length !== 0) {
+                // check if task is at doing state
+                let checkstate = `SELECT * FROM nodelogin.task WHERE Task_state = "doing" AND Task_id = ?`
+                db.query(checkstate, [ttaskID], (err, result) => {
+                  if (result.length !== 0) {
+                    // task is at doing state
+                    let updatetask = `UPDATE nodelogin.task SET Task_state = "done" WHERE Task_id = ?`
+                    db.query(updatetask, [ttaskID], (err, result) => {
+                      if (err) {
+                        throw err
+                      } else {
+                        // update success
+                        return res.status(200).json({
+                          success: true,
+                          code: 200,
+                          message: `Task ID: ${ttaskID} under ${tappname} application, has been promoted by ${tusername} successfully from Doing to Done State`
+                        })
+                      }
+                    })
+                  } else {
+                    // Task is not even at doing state or does not exist
+                    return res.status(400).json({
+                      success: false,
+                      code: 400,
+                      message: `Task ID: ${ttaskID} is not at Doing State or does not exist`
+                    })
+                  }
+                })
+              } else {
+                // forbidden request 403
+                return res.status(403).json({
+                  success: false,
+                  code: 403,
+                  message: `${tusername} is not permitted to edit tasks from Doing to Done state under ${tappname} application`
+                })
+              }
+            })
+          } else {
+            return res.status(404).json({
+              success: false,
+              code: 404,
+              message: "Application not found"
+            })
+          }
+        })
+      }
+    } else {
+      return res.status(400).json({
+        success: false,
+        code: 400,
+        message: "Incorrect Credentials"
+      })
+    }
+  })
+
+  // return res.status(200).json({ message: "it works" })
 }
